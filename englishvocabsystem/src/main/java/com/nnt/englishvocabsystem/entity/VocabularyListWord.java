@@ -9,8 +9,8 @@ import java.time.Instant;
 @Table(name = "vocabulary_list_words")
 public class VocabularyListWord {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @NotNull

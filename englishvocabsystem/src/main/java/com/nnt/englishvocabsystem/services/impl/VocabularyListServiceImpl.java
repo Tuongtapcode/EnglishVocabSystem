@@ -4,15 +4,14 @@ import com.nnt.englishvocabsystem.dto.CategoryDTO;
 import com.nnt.englishvocabsystem.dto.VocabularyListDTO;
 import com.nnt.englishvocabsystem.dto.VocabularyListRequest;
 import com.nnt.englishvocabsystem.dto.WordDTO;
-import com.nnt.englishvocabsystem.entity.User;
-import com.nnt.englishvocabsystem.entity.VocabularyList;
-import com.nnt.englishvocabsystem.entity.VocabularyListWord;
-import com.nnt.englishvocabsystem.entity.Word;
+import com.nnt.englishvocabsystem.entity.*;
 
+import com.nnt.englishvocabsystem.enums.WordStatus;
 import com.nnt.englishvocabsystem.exceptions.DuplicateVocabularyListException;
 import com.nnt.englishvocabsystem.exceptions.ResourceNotFoundException;
 import com.nnt.englishvocabsystem.repositories.VocabularyListRepository;
 import com.nnt.englishvocabsystem.repositories.VocabularyListWordRepository;
+import com.nnt.englishvocabsystem.repositories.WordProgressRepository;
 import com.nnt.englishvocabsystem.services.VocabularyListService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +29,9 @@ public class VocabularyListServiceImpl implements VocabularyListService {
     private VocabularyListRepository vocabularyListRepository;
     @Autowired
     private VocabularyListWordRepository vocabularyListWordRepository;
+    @Autowired
+    private WordProgressRepository wordProgressRepository;
+
 
     @Override
     public List<VocabularyListDTO> getVocabularyList(User user) {
@@ -52,6 +54,7 @@ public class VocabularyListServiceImpl implements VocabularyListService {
     public List<WordDTO> getWordsInList(Integer listId, User user) {
         VocabularyList list = vocabularyListRepository.findById(listId)
                 .orElseThrow(() -> new ResourceNotFoundException("Vocabulary list not found"));
+
         if (!list.getUser().equals(user)) {
             throw new AccessDeniedException("Bạn không có quyền truy cập danh sách này");
         }
@@ -60,12 +63,29 @@ public class VocabularyListServiceImpl implements VocabularyListService {
                 .stream()
                 .map(vlw -> {
                     Word w = vlw.getWord();
+
+                    // tìm tiến trình học của user với từ hiện tại
+                    WordProgress wp = wordProgressRepository.findByUserAndWord(user, w)
+                            .orElse(null);
+
+                    // xác định trạng thái học
+                    WordStatus status = WordStatus.UNLEARNED; // mặc định
+                    if (wp != null) {
+                        // nếu có thể lấy logic status từ wp, ví dụ:
+                        if (Boolean.TRUE.equals(wp.getIsLearning())) {
+                            status = WordStatus.LEARNING;
+                        } else if (wp.getRepetitionCount() != null && wp.getRepetitionCount() > 0) {
+                            status = WordStatus.REVIEW;
+                        }
+                        // bạn có thể tinh chỉnh thêm dựa trên nextReviewDate, correctReviews...
+                    }
+
                     return new WordDTO(
                             w.getId(),
                             w.getEnglishWord(),
                             w.getVietnameseMeaning(),
                             w.getPronunciation(),
-                            w.getWordType(),   // giữ nguyên enum, không cần .name()
+                            w.getWordType(),
                             w.getLevel(),
                             w.getImageUrl(),
                             w.getAudioUrl(),
@@ -75,11 +95,13 @@ public class VocabularyListServiceImpl implements VocabularyListService {
                                     w.getCategory().getDescription(),
                                     w.getCategory().getImage(),
                                     w.getCategory().getIsActive()
-                            )
+                            ),
+                            status // thêm vào cuối DTO
                     );
                 })
                 .toList();
     }
+
 
     @Override
     public VocabularyList createVocabularyList(VocabularyListRequest request, User user) {

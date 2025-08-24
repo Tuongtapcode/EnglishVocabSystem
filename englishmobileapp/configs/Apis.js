@@ -1,7 +1,7 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const BASE_URL = "http://192.168.1.6:8080/api/";
+const BASE_URL = "http://192.168.1.10:8080/api/";
 // const BASE_URL = "http://10.17.29.141:8080/api/";
 
 export const endpoints = {
@@ -12,6 +12,7 @@ export const endpoints = {
   words: "/words",
   vocabulary: "/secure/vocabulary",
   vocabularyListWords: "/secure/vocabulary-list-words",
+  wordProgress: "/secure/word-progress",
 };
 export default axios.create({
   baseURL: BASE_URL,

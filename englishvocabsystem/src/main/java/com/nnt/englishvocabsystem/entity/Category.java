@@ -9,36 +9,36 @@ import jakarta.validation.constraints.Size;
 
 import java.time.Instant;
 
-    @Entity
-    @Table(name = "category")
-    public class Category {
-        @Id
-        @Column(name = "id", nullable = false)
-        private Integer id;
+@Entity
+@Table(name = "category")
+public class Category {
+    @Id
+    @Column(name = "id", nullable = false)
+    private Integer id;
 
-        @Size(max = 100)
-        @NotNull
-        @Column(name = "name", nullable = false, length = 100)
-        private String name;
+    @Size(max = 100)
+    @NotNull
+    @Column(name = "name", nullable = false, length = 100)
+    private String name;
 
-        @Size(max = 100)
-        @NotNull
-        @Column(name = "description", nullable = false, length = 100)
-        private String description;
+    @Size(max = 100)
+    @NotNull
+    @Column(name = "description", nullable = false, length = 100)
+    private String description;
 
-        @Size(max = 100)
-        @NotNull
-        @Column(name = "image", nullable = false, length = 100)
-        private String image;
+    @Size(max = 100)
+    @NotNull
+    @Column(name = "image", nullable = false, length = 100)
+    private String image;
 
-        @Column(name = "is_active")
-        private Boolean isActive;
+    @Column(name = "is_active")
+    private Boolean isActive;
 
-        @Column(name = "created_at")
-        private Instant createdAt;
+    @Column(name = "created_at")
+    private Instant createdAt;
 
-        @Column(name = "updated_at")
-        private Instant updatedAt;
+    @Column(name = "updated_at")
+    private Instant updatedAt;
 
     public Integer getId() {
         return id;

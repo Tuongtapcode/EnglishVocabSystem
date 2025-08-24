@@ -10,7 +10,6 @@ import java.time.Instant;
 @Table(name = "user")
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
 
@@ -36,13 +35,13 @@ public class User {
 
     @Size(max = 100)
     @NotNull
-    @Column(name = "phone", nullable = false, length = 100)
-    private String phone;
+    @Column(name = "email", nullable = false, length = 100)
+    private String email;
 
     @Size(max = 100)
     @NotNull
-    @Column(name = "email", nullable = false, length = 100)
-    private String email;
+    @Column(name = "phone", nullable = false, length = 100)
+    private String phone;
 
     @Size(max = 100)
     @Column(name = "avatar", length = 100)
@@ -108,20 +107,20 @@ public class User {
         this.password = password;
     }
 
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public String getAvatar() {

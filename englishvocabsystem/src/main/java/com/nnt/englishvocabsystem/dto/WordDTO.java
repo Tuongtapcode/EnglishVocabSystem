@@ -1,6 +1,7 @@
 package com.nnt.englishvocabsystem.dto;
 
 import com.nnt.englishvocabsystem.enums.Level;
+import com.nnt.englishvocabsystem.enums.WordStatus;
 
 public class WordDTO {
     private Integer id;
@@ -13,6 +14,8 @@ public class WordDTO {
     private String audioUrl;
     private CategoryDTO category;
 
+    private WordStatus wordStatus;
+
     public WordDTO(Integer id, String englishWord, String vietnameseMeaning, String pronunciation, String wordType, Level level, String imageUrl, String audioUrl, CategoryDTO category) {
         this.id = id;
         this.englishWord = englishWord;
@@ -23,6 +26,19 @@ public class WordDTO {
         this.imageUrl = imageUrl;
         this.audioUrl = audioUrl;
         this.category = category;
+    }
+
+    public WordDTO(Integer id, String englishWord, String vietnameseMeaning, String pronunciation, String wordType, Level level, String imageUrl, String audioUrl, CategoryDTO category, WordStatus wordStatus) {
+        this.id = id;
+        this.englishWord = englishWord;
+        this.vietnameseMeaning = vietnameseMeaning;
+        this.pronunciation = pronunciation;
+        this.wordType = wordType;
+        this.level = level;
+        this.imageUrl = imageUrl;
+        this.audioUrl = audioUrl;
+        this.category = category;
+        this.wordStatus = wordStatus;
     }
 
     public Integer getId() {
@@ -94,5 +110,13 @@ public class WordDTO {
     }
     public void setCategory(CategoryDTO category) {
         this.category = category;
+    }
+
+    public WordStatus getWordStatus() {
+        return wordStatus;
+    }
+
+    public void setWordStatus(WordStatus wordStatus) {
+        this.wordStatus = wordStatus;
     }
 }

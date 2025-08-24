@@ -7,6 +7,7 @@ import {
   Alert,
   TouchableOpacity,
   Dimensions,
+  Animated,
 } from "react-native";
 import {
   Appbar,
@@ -43,10 +44,17 @@ const VocabularyWordsScreen = ({ route, navigation }) => {
   const [selectedLevel, setSelectedLevel] = useState("all");
   const [selectedWordType, setSelectedWordType] = useState("all");
   const [menuVisible, setMenuVisible] = useState(false);
-  const [sortBy, setSortBy] = useState("alphabetical"); // alphabetical, level, wordType, dateAdded
+  const [sortBy, setSortBy] = useState("alphabetical");
   const [showAddWordModal, setShowAddWordModal] = useState(false);
   const [availableWords, setAvailableWords] = useState([]);
   const [selectedWordsToAdd, setSelectedWordsToAdd] = useState([]);
+
+  const [wordStatuses, setWordStatuses] = useState({});
+  // NEW STATES for collapsible sections
+  const [showSearch, setShowSearch] = useState(false);
+  const [showStats, setShowStats] = useState(true);
+  const searchHeight = useState(new Animated.Value(0))[0];
+  const statsHeight = useState(new Animated.Value(1))[0];
 
   // Level colors
   const levelColors = {
@@ -69,6 +77,43 @@ const VocabularyWordsScreen = ({ route, navigation }) => {
     PRONOUN: "#E91E63",
   };
 
+  // Word status colors
+  const statusColors = {
+    UNLEARNED: "#9E9E9E",
+    LEARNING: "#FF9800",
+    LEARNED: "#4CAF50",
+    REVIEW: "#2196F3",
+    MASTERED: "#9C27B0",
+  };
+
+  const statusLabels = {
+    UNLEARNED: "Unlearned",
+    LEARNING: "Learning",
+    LEARNED: "Learned",
+    REVIEW: "Review",
+    MASTERED: "Mastered",
+  };
+
+  // Toggle search section
+  const toggleSearch = () => {
+    setShowSearch(!showSearch);
+    Animated.timing(searchHeight, {
+      toValue: showSearch ? 0 : 1,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+  };
+
+  // Toggle stats section
+  const toggleStats = () => {
+    setShowStats(!showStats);
+    Animated.timing(statsHeight, {
+      toValue: showStats ? 0 : 1,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+  };
+
   // Fetch vocabulary words
   const loadWordList = async () => {
     try {
@@ -84,9 +129,11 @@ const VocabularyWordsScreen = ({ route, navigation }) => {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     loadWordList();
   }, []);
+
   // Fetch available words for adding
   const fetchAvailableWords = async () => {
     try {
@@ -113,10 +160,7 @@ const VocabularyWordsScreen = ({ route, navigation }) => {
       const res = await api.delete(url, { data: payload });
 
       if (res.status == 204) {
-        if (res.status == 204) {
-          Alert.alert("Xóa thành công", "Đã xóa từ thành công khỏi danh sách");
-          loadWordList();
-        }
+        Alert.alert("Xóa thành công", "Đã xóa từ thành công khỏi danh sách");
         loadWordList();
       }
     } catch (error) {
@@ -124,6 +168,7 @@ const VocabularyWordsScreen = ({ route, navigation }) => {
       console.error("Error removing word:", error);
     }
   };
+
   const addWordsToList = async () => {
     if (selectedWordsToAdd.length === 0) {
       Alert.alert("Thông báo", "Vui lòng chọn ít nhất một từ để thêm");
@@ -234,6 +279,8 @@ const VocabularyWordsScreen = ({ route, navigation }) => {
     filterAndSortWords();
   }, [filterAndSortWords]);
 
+  
+
   // Refresh handler
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -257,7 +304,7 @@ const VocabularyWordsScreen = ({ route, navigation }) => {
     );
   };
 
-  // Start quick learning session - NEW FUNCTION
+  // Start quick learning session
   const startQuickLearning = () => {
     if (words.length === 0) {
       Alert.alert(
@@ -267,19 +314,49 @@ const VocabularyWordsScreen = ({ route, navigation }) => {
       return;
     }
 
-    // Lấy ngẫu nhiên 10 từ hoặc tất cả từ nếu ít hơn 10
     const wordsToLearn = filteredWords.length > 0 ? filteredWords : words;
-    const randomWords = wordsToLearn
-      .sort(() => 0.5 - Math.random())
-      .slice(0, Math.min(10, wordsToLearn.length));
+
+    const prioritizedWords = wordsToLearn.sort((a, b) => {
+      const statusPriority = {
+        UNLEARNED: 1,
+        LEARNING: 2,
+        REVIEW: 3,
+        LEARNED: 4,
+        MASTERED: 5,
+      };
+
+      const aPriority = statusPriority[a.status || "UNLEARNED"];
+      const bPriority = statusPriority[b.status || "UNLEARNED"];
+
+      if (aPriority === bPriority) {
+        const levelOrder = ["A1", "A2", "B1", "B2", "C1", "C2"];
+        return levelOrder.indexOf(a.level) - levelOrder.indexOf(b.level);
+      }
+
+      return aPriority - bPriority;
+    });
+
+    const BATCH_SIZE = 10;
+    const selectedWords = prioritizedWords.slice(
+      0,
+      Math.min(BATCH_SIZE, prioritizedWords.length)
+    );
+
+    if (selectedWords.length === 0) {
+      Alert.alert(
+        "Thông báo",
+        "Không có từ phù hợp để học. Hãy thử điều chỉnh bộ lọc."
+      );
+      return;
+    }
 
     navigation.navigate("QuickLearning", {
       vocabularyList,
-      words: randomWords,
-      mode: "quick", // Đánh dấu đây là chế độ học nhanh
+      words: selectedWords,
+      mode: "flashcard",
+      totalWordsAvailable: prioritizedWords.length,
     });
   };
-
   // Start learning session
   const startLearningSession = () => {
     if (words.length === 0) {
@@ -306,6 +383,7 @@ const VocabularyWordsScreen = ({ route, navigation }) => {
       words: filteredWords.length >= 5 ? filteredWords : words,
     });
   };
+
   const playAudio = async (audioUrl) => {
     try {
       console.info("play", audioUrl);
@@ -315,6 +393,7 @@ const VocabularyWordsScreen = ({ route, navigation }) => {
       console.error("Error playing audio", error);
     }
   };
+
   // Render word card
   const renderWordCard = (word) => (
     <Card key={word.id} style={styles.wordCard}>
@@ -328,6 +407,15 @@ const VocabularyWordsScreen = ({ route, navigation }) => {
             </Text>
           </View>
           <View style={styles.wordMeta}>
+            <Chip
+              style={[
+                styles.statusChip,
+                { backgroundColor: statusColors[word.wordStatus || "UNLEARNED"] },
+              ]}
+              textStyle={styles.chipText}
+            >
+              {statusLabels[word.wordStatus || "UNLEARNED"]}
+            </Chip>
             <Chip
               style={[
                 styles.levelChip,
@@ -367,10 +455,9 @@ const VocabularyWordsScreen = ({ route, navigation }) => {
           <Button
             mode="contained-tonal"
             icon="book-open-variant"
-            // onPress={() => navigation.navigate("WordDetail", { word })}
             style={styles.actionButton}
           >
-            Chi tiết
+            Học từ
           </Button>
           <IconButton
             icon="delete"
@@ -474,6 +561,8 @@ const VocabularyWordsScreen = ({ route, navigation }) => {
       <Appbar.Header>
         <Appbar.BackAction onPress={() => navigation.goBack()} />
         <Appbar.Content title={vocabularyList.name} />
+        <Appbar.Action icon="magnify" onPress={toggleSearch} />
+        <Appbar.Action icon="chart-bar" onPress={toggleStats} />
         <Menu
           visible={menuVisible}
           onDismiss={() => setMenuVisible(false)}
@@ -517,133 +606,158 @@ const VocabularyWordsScreen = ({ route, navigation }) => {
         </Menu>
       </Appbar.Header>
 
-      {/* Search and filters */}
-      <Surface style={styles.searchContainer}>
-        <Searchbar
-          placeholder="Tìm kiếm từ vựng..."
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          style={styles.searchBar}
-        />
-
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.filterContainer}
-        >
-          <Chip
-            selected={selectedLevel === "all"}
-            onPress={() => setSelectedLevel("all")}
-            style={styles.filterChip}
-          >
-            Tất cả cấp độ
-          </Chip>
-          {["A1", "A2", "B1", "B2", "C1", "C2"].map((level) => (
-            <Chip
-              key={level}
-              selected={selectedLevel === level}
-              onPress={() => setSelectedLevel(level)}
-              style={[
-                styles.filterChip,
-                selectedLevel === level && {
-                  backgroundColor: levelColors[level],
-                },
-              ]}
-            >
-              {level}
-            </Chip>
-          ))}
-        </ScrollView>
-      </Surface>
-
-      {/* Stats */}
-      <Surface style={styles.statsContainer}>
-        <View style={styles.statItem}>
-          <Text style={styles.statNumber}>{words.length}</Text>
-          <Text style={styles.statLabel}>Tổng từ</Text>
-        </View>
-        <View style={styles.statItem}>
-          <Text style={styles.statNumber}>{filteredWords.length}</Text>
-          <Text style={styles.statLabel}>Đang hiển thị</Text>
-        </View>
-        <View style={styles.statItem}>
-          <Text style={styles.statNumber}>
-            {words.filter((w) => ["A1", "A2"].includes(w.level)).length}
-          </Text>
-          <Text style={styles.statLabel}>Cơ bản</Text>
-        </View>
-        <View style={styles.statItem}>
-          <Text style={styles.statNumber}>
-            {words.filter((w) => ["C1", "C2"].includes(w.level)).length}
-          </Text>
-          <Text style={styles.statLabel}>Nâng cao</Text>
-        </View>
-      </Surface>
-
-      {/* Quick Learning Button - NEW ADDITION */}
-      <View style={styles.quickLearningContainer}>
-        <TouchableOpacity
-          style={styles.quickLearningButton}
-          onPress={startQuickLearning}
-          activeOpacity={0.8}
-        >
-          <View style={styles.quickLearningContent}>
-            <View style={styles.quickLearningIcon}>
-              <Text style={styles.quickLearningEmoji}>⚡</Text>
-            </View>
-            <View style={styles.quickLearningText}>
-              <Text style={styles.quickLearningTitle}>Học ngay</Text>
-              <Text style={styles.quickLearningSubtitle}>
-                10 từ ngẫu nhiên • 5 phút
-              </Text>
-            </View>
-            <View style={styles.quickLearningArrow}>
-              <Text style={styles.quickLearningArrowText}>▶</Text>
-            </View>
-          </View>
-        </TouchableOpacity>
-      </View>
-
-      {/* Action buttons */}
-      <View style={styles.actionButtonsContainer}>
-        <Button
-          mode="contained"
-          icon="school"
-          onPress={startLearningSession}
-          style={[styles.actionBtn, { backgroundColor: "#4CAF50" }]}
-          labelStyle={styles.actionBtnLabel}
-        >
-          Học từ vựng
-        </Button>
-        <Button
-          mode="contained"
-          icon="help-circle"
-          onPress={startQuiz}
-          style={[styles.actionBtn, { backgroundColor: "#2196F3" }]}
-          labelStyle={styles.actionBtnLabel}
-        >
-          Làm bài kiểm tra
-        </Button>
-      </View>
-
-      {/* Words list */}
       <ScrollView
-        style={styles.wordsContainer}
+        style={styles.scrollContainer}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {filteredWords.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>
-              {words.length === 0
-                ? "Danh sách từ vựng trống. Hãy thêm từ để bắt đầu học!"
-                : "Không tìm thấy từ nào phù hợp với bộ lọc."}
-            </Text>
-          </View>
-        ) : (
-          filteredWords.map(renderWordCard)
-        )}
+        {/* Collapsible Search Section */}
+        <Animated.View
+          style={[
+            styles.collapsibleSection,
+            {
+              maxHeight: searchHeight.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, 200],
+              }),
+              opacity: searchHeight,
+            },
+          ]}
+        >
+          <Surface style={styles.searchContainer}>
+            <Searchbar
+              placeholder="Tìm kiếm từ vựng..."
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              style={styles.searchBar}
+            />
+
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.filterContainer}
+            >
+              <Chip
+                selected={selectedLevel === "all"}
+                onPress={() => setSelectedLevel("all")}
+                style={styles.filterChip}
+              >
+                Tất cả cấp độ
+              </Chip>
+              {["A1", "A2", "B1", "B2", "C1", "C2"].map((level) => (
+                <Chip
+                  key={level}
+                  selected={selectedLevel === level}
+                  onPress={() => setSelectedLevel(level)}
+                  style={[
+                    styles.filterChip,
+                    selectedLevel === level && {
+                      backgroundColor: levelColors[level],
+                    },
+                  ]}
+                >
+                  {level}
+                </Chip>
+              ))}
+            </ScrollView>
+          </Surface>
+        </Animated.View>
+
+        {/* Collapsible Stats Section */}
+        <Animated.View
+          style={[
+            styles.collapsibleSection,
+            {
+              maxHeight: statsHeight.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, 100],
+              }),
+              opacity: statsHeight,
+            },
+          ]}
+        >
+          <Surface style={styles.statsContainer}>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{words.length}</Text>
+              <Text style={styles.statLabel}>Tổng từ</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{filteredWords.length}</Text>
+              <Text style={styles.statLabel}>Đang hiển thị</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>
+                {words.filter((w) => ["A1", "A2"].includes(w.level)).length}
+              </Text>
+              <Text style={styles.statLabel}>Cơ bản</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>
+                {words.filter((w) => ["C1", "C2"].includes(w.level)).length}
+              </Text>
+              <Text style={styles.statLabel}>Nâng cao</Text>
+            </View>
+          </Surface>
+        </Animated.View>
+
+        {/* Compact Quick Learning Button */}
+        <View style={styles.compactQuickLearningContainer}>
+          <TouchableOpacity
+            style={styles.compactQuickLearningButton}
+            onPress={startQuickLearning}
+            activeOpacity={0.8}
+          >
+            <View style={styles.compactQuickLearningContent}>
+              <Text style={styles.compactQuickLearningEmoji}>⚡</Text>
+              <View style={styles.compactQuickLearningText}>
+                <Text style={styles.compactQuickLearningTitle}>
+                  Học ngay 10 từ
+                </Text>
+              </View>
+              <Text style={styles.compactQuickLearningArrow}>▶</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+
+        {/* Compact Action buttons */}
+        <View style={styles.compactActionButtonsContainer}>
+          <Button
+            mode="contained"
+            icon="school"
+            onPress={startLearningSession}
+            style={[styles.compactActionBtn, { backgroundColor: "#4CAF50" }]}
+            labelStyle={styles.compactActionBtnLabel}
+            compact
+          >
+            Học từ vựng
+          </Button>
+          <Button
+            mode="contained"
+            icon="help-circle"
+            onPress={startQuiz}
+            style={[styles.compactActionBtn, { backgroundColor: "#2196F3" }]}
+            labelStyle={styles.compactActionBtnLabel}
+            compact
+          >
+            Kiểm tra
+          </Button>
+        </View>
+
+        {/* Words list */}
+        <View style={styles.wordsContainer}>
+          {filteredWords.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>
+                {words.length === 0
+                  ? "Danh sách từ vựng trống. Hãy thêm từ để bắt đầu học!"
+                  : "Không tìm thấy từ nào phù hợp với bộ lọc."}
+              </Text>
+            </View>
+          ) : (
+            filteredWords.map(renderWordCard)
+          )}
+        </View>
       </ScrollView>
 
       {/* Add word FAB */}
@@ -666,6 +780,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f5f5f5",
   },
+  scrollContainer: {
+    flex: 1,
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
@@ -675,9 +792,15 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 16,
   },
+  collapsibleSection: {
+    overflow: "hidden",
+  },
   searchContainer: {
     padding: 16,
     elevation: 2,
+    margin: 8,
+    marginBottom: 12,
+    borderRadius: 12,
   },
   searchBar: {
     marginBottom: 12,
@@ -691,8 +814,9 @@ const styles = StyleSheet.create({
   statsContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
-    padding: 16,
-    margin: 16,
+    padding: 12,
+    margin: 8,
+    marginBottom: 12,
     borderRadius: 12,
     elevation: 2,
   },
@@ -700,91 +824,73 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   statNumber: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: "bold",
     color: "#2196F3",
   },
   statLabel: {
-    fontSize: 12,
+    fontSize: 11,
     color: "#666",
-    marginTop: 4,
+    marginTop: 2,
   },
-  // NEW STYLES FOR QUICK LEARNING BUTTON
-  quickLearningContainer: {
+  // COMPACT QUICK LEARNING STYLES
+  compactQuickLearningContainer: {
     paddingHorizontal: 16,
-    marginBottom: 12,
+    marginVertical: 8,
   },
-  quickLearningButton: {
+  compactQuickLearningButton: {
     backgroundColor: "#FF6B35",
-    borderRadius: 16,
-    elevation: 4,
+    borderRadius: 12,
+    elevation: 3,
     shadowColor: "#FF6B35",
     shadowOffset: {
       width: 0,
-      height: 4,
+      height: 2,
     },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
   },
-  quickLearningContent: {
+  compactQuickLearningContent: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 16,
-    paddingHorizontal: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
   },
-  quickLearningIcon: {
-    width: 50,
-    height: 50,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    borderRadius: 25,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 16,
+  compactQuickLearningEmoji: {
+    fontSize: 20,
+    marginRight: 12,
   },
-  quickLearningEmoji: {
-    fontSize: 24,
-  },
-  quickLearningText: {
+  compactQuickLearningText: {
     flex: 1,
   },
-  quickLearningTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "white",
-    marginBottom: 4,
-  },
-  quickLearningSubtitle: {
-    fontSize: 14,
-    color: "rgba(255, 255, 255, 0.8)",
-  },
-  quickLearningArrow: {
-    width: 30,
-    height: 30,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  quickLearningArrowText: {
+  compactQuickLearningTitle: {
     fontSize: 16,
+    fontWeight: "bold",
+    color: "white",
+  },
+  compactQuickLearningArrow: {
+    fontSize: 14,
     color: "white",
     fontWeight: "bold",
   },
-  actionButtonsContainer: {
+  // COMPACT ACTION BUTTONS
+  compactActionButtonsContainer: {
     flexDirection: "row",
     paddingHorizontal: 16,
-    marginBottom: 16,
-    gap: 12,
+    marginVertical: 8,
+    gap: 8,
   },
-  actionBtn: {
+  compactActionBtn: {
     flex: 1,
-    paddingVertical: 8,
+    paddingVertical: 4,
   },
-  actionBtnLabel: {
-    fontSize: 16,
+  compactActionBtnLabel: {
+    fontSize: 14,
     fontWeight: "bold",
   },
   wordsContainer: {
-    flex: 1,
     paddingHorizontal: 16,
+    paddingBottom: 80, // Space for FAB
   },
   wordCard: {
     marginBottom: 12,
@@ -818,6 +924,10 @@ const styles = StyleSheet.create({
   wordMeta: {
     alignItems: "flex-end",
     gap: 4,
+  },
+  statusChip: {
+    height: 32,
+    marginBottom: 4,
   },
   levelChip: {
     height: 32,

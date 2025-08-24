@@ -1,6 +1,5 @@
 package com.nnt.englishvocabsystem.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nnt.englishvocabsystem.enums.Level;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -39,11 +38,9 @@ public class Word {
     @Column(name = "level", nullable = false)
     private Level level;
 
-
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "category_id", nullable = false)
-    @JsonIgnore
     private Category category;
 
     @Lob
