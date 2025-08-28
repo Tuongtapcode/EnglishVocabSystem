@@ -279,8 +279,6 @@ const VocabularyWordsScreen = ({ route, navigation }) => {
     filterAndSortWords();
   }, [filterAndSortWords]);
 
-  
-
   // Refresh handler
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -410,7 +408,9 @@ const VocabularyWordsScreen = ({ route, navigation }) => {
             <Chip
               style={[
                 styles.statusChip,
-                { backgroundColor: statusColors[word.wordStatus || "UNLEARNED"] },
+                {
+                  backgroundColor: statusColors[word.wordStatus || "UNLEARNED"],
+                },
               ]}
               textStyle={styles.chipText}
             >
@@ -455,6 +455,11 @@ const VocabularyWordsScreen = ({ route, navigation }) => {
           <Button
             mode="contained-tonal"
             icon="book-open-variant"
+            onPress={() => {
+              navigation.navigate("VocabularyExercise", {
+                word: word
+              });
+            }}
             style={styles.actionButton}
           >
             Học từ

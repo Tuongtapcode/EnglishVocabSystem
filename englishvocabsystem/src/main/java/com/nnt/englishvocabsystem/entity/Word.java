@@ -20,8 +20,7 @@ public class Word {
     private String englishWord;
 
     @NotNull
-    @Lob
-    @Column(name = "vietnamese_meaning", nullable = false)
+    @Column(name = "vietnamese_meaning", nullable = false, length = 100)
     private String vietnameseMeaning;
 
     @Size(max = 200)

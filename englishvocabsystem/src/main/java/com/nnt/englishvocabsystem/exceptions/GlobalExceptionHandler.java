@@ -32,4 +32,9 @@ public class GlobalExceptionHandler {
                 .body(Map.of("error", ex.getMessage()));
     }
 
+    @ExceptionHandler(NoQuestionsFoundException.class)
+    public ResponseEntity<Map<String, String>> handleNoQuestionsFound(NoQuestionsFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", ex.getMessage()));
+    }
+
 }

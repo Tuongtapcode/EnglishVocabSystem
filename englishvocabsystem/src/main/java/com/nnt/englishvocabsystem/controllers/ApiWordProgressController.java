@@ -1,5 +1,7 @@
 package com.nnt.englishvocabsystem.controllers;
 
+import com.nnt.englishvocabsystem.dto.ReviewScheduleResponse;
+import com.nnt.englishvocabsystem.dto.ReviewWordResponse;
 import com.nnt.englishvocabsystem.dto.WordProgressResponse;
 import com.nnt.englishvocabsystem.dto.WordProgressRequest;
 import com.nnt.englishvocabsystem.entity.User;
@@ -7,14 +9,14 @@ import com.nnt.englishvocabsystem.entity.WordProgress;
 import com.nnt.englishvocabsystem.services.UserService;
 import com.nnt.englishvocabsystem.services.WordProgressService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/secure/word-progress")
@@ -23,31 +25,24 @@ public class ApiWordProgressController {
     WordProgressService wordProgressService;
     @Autowired
     UserService userService;
-    @PostMapping("/update")
-    public ResponseEntity<?> updateWordProgress(
-            @RequestBody WordProgressRequest request,
-            Principal principal) {
 
+    @GetMapping("/review")
+    public ResponseEntity<Page<ReviewWordResponse>> getReviewWords(
+            Principal principal,
+            @RequestParam Map<String, String> params  // nhận tất cả query param
+    ) {
         User user = userService.getUserByUsername(principal.getName());
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
-        }
 
-        WordProgress wp = wordProgressService.saveOrUpdateProgress(request, user);
-        WordProgressResponse dto = new WordProgressResponse();
-        dto.setId(wp.getId());
-        dto.setWordId(wp.getWord().getId());
-        dto.setEnglishWord(wp.getWord().getEnglishWord());
-        dto.setLastScore(wp.getLastScore());
-        dto.setLearning(wp.getIsLearning());
-        dto.setNextReviewDate(wp.getNextReviewDate());
-        dto.setRepetitionCount(wp.getRepetitionCount());
-        dto.setEaseFactor(wp.getEaseFactor());
-        dto.setIntervalDays(wp.getIntervalDays());
-        dto.setDifficultyLevel(wp.getDifficultyLevel());
-        dto.setTotalReviews(wp.getTotalReviews());
-        dto.setCorrectReviews(wp.getCorrectReviews());
-        dto.setLastReviewDate(wp.getLastReviewDate());
-        return ResponseEntity.ok(dto);
+        // gọi service, service sẽ xử lý reviewAt, page, size, keyword,...
+        Page<ReviewWordResponse> pageResult = wordProgressService.getDueWords(user, params);
+
+        return ResponseEntity.ok(pageResult);
+    }
+    @GetMapping("/schedule")
+    public ResponseEntity<ReviewScheduleResponse> getReviewSchedule(
+            Principal principal
+    ) {
+        User user = userService.getUserByUsername(principal.getName());
+        return ResponseEntity.ok(wordProgressService.getReviewSchedule(user));
     }
 }

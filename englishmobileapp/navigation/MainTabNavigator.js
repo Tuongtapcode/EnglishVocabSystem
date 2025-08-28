@@ -11,6 +11,9 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import VocabularyListManager from "../components/vocabularylist/VocabularyList";
 import VocabularyWordsScreen from "../components/vocabularylist/VocabularyWords";
 import QuickLearningScreen from "../components/vocabularylist/QuickLearningScreen";
+import VocabularyExerciseScreen from "../components/vocabularylist/VocabularyExerciseScreen";
+import SessionResultScreen from "../components/vocabularylist/SessionResultScreen";
+import ReviewWordsList from "../components/wordprogress/ReviewWordsList";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -64,6 +67,20 @@ export default function MainTabNavigator() {
           name="QuickLearning"
           component={QuickLearningScreen}
           options={{ title: "Học nhanh" }}
+        />
+        <Stack.Screen
+          name="SessionResultScreen"
+          component={SessionResultScreen}
+          options={{ title: "Kết quả" }}
+        />
+
+        <Stack.Screen
+          name="VocabularyExercise"
+          component={VocabularyExerciseScreen}
+          screenOptions={{
+            headerShown: true,
+            title: "Học từ",
+          }}
         />
       </Stack.Navigator>
     );
@@ -143,6 +160,16 @@ export default function MainTabNavigator() {
           headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <Icon size={size} color={color} name="view-list" />
+          ),
+        }}
+      ></Tab.Screen>
+      <Tab.Screen
+        name="wordProgressScreen"
+        component={ReviewWordsList}
+        options={{
+          title: "SM2",
+          tabBarIcon: ({ color, size }) => (
+            <Icon size={size} color={color} name="book" />
           ),
         }}
       ></Tab.Screen>

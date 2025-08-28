@@ -30,7 +30,7 @@ const CARD_WIDTH = width - 40;
 const CARD_HEIGHT = height * 0.6;
 
 const QuickLearningScreen = ({ route, navigation }) => {
-  const { vocabularyList, words, mode } = route.params;
+  const {  words, mode } = route.params;
 
   // States
   const [currentIndex, setCurrentIndex] = useState(0);

@@ -1,0 +1,30 @@
+package com.nnt.englishvocabsystem.repositories;
+
+import com.nnt.englishvocabsystem.entity.StudySession;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface StudySessionRepository extends JpaRepository<StudySession, Integer> {
+
+
+    List<StudySession> findByUserIdAndCompleted(Integer userId, Boolean completed);
+
+    Optional<StudySession> findTopByUserIdOrderByStartTimeDesc(Integer userId);
+
+
+    List<StudySession> findByUserIdAndSessionType(Integer userId, String sessionType);
+
+    @Query("SELECT s FROM StudySession s WHERE s.user.id = :userId AND s.startTime BETWEEN :startTime AND :endTime")
+    List<StudySession> findByUserIdAndTimeRange(@Param("userId") Integer userId,
+                                                @Param("startTime") Instant startTime,
+                                                @Param("endTime") Instant endTime);
+
+
+}
