@@ -4,7 +4,7 @@ package com.nnt.englishvocabsystem.dto;
 import java.time.Instant;
 //progress
 public class ReviewWordResponse {
-    private Integer wordId;
+    private Integer Id;
     private String englishWord;
     private String vietnameseMeaning;
     private String pronunciation;
@@ -27,8 +27,8 @@ public class ReviewWordResponse {
     public ReviewWordResponse() {
     }
 
-    public ReviewWordResponse(Integer wordId, String englishWord, String vietnameseMeaning, String pronunciation, String wordType, String level, String imageUrl, String audioUrl, Instant nextReviewDate, Instant lastReviewDate, Integer totalReviews, Integer correctReviews, Integer intervalDays, Double easeFactor, Integer repetitionCount, Integer lastScore, Boolean isLearning, CategoryDTO category) {
-        this.wordId = wordId;
+    public ReviewWordResponse(Integer Id, String englishWord, String vietnameseMeaning, String pronunciation, String wordType, String level, String imageUrl, String audioUrl, Instant nextReviewDate, Instant lastReviewDate, Integer totalReviews, Integer correctReviews, Integer intervalDays, Double easeFactor, Integer repetitionCount, Integer lastScore, Boolean isLearning, CategoryDTO category) {
+        this.Id = Id;
         this.englishWord = englishWord;
         this.vietnameseMeaning = vietnameseMeaning;
         this.pronunciation = pronunciation;
@@ -48,12 +48,12 @@ public class ReviewWordResponse {
         this.category = category;
     }
 
-    public Integer getWordId() {
-        return wordId;
+    public Integer getId() {
+        return Id;
     }
 
-    public void setWordId(Integer wordId) {
-        this.wordId = wordId;
+    public void setId(Integer id) {
+        Id = id;
     }
 
     public String getEnglishWord() {

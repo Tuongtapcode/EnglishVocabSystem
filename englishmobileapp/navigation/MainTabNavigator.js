@@ -22,7 +22,28 @@ export default function MainTabNavigator() {
   const user = useContext(MyUserContext);
   const dispatch = useContext(MyDispatchContext);
   console.log("user", user);
-
+  const wordProgressStack = () => {
+    return (
+      <>
+        <Stack.Navigator>
+          <Stack.Screen
+            name="ReviewWordsList "
+            component={ReviewWordsList}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="VocabularyExercise"
+            component={VocabularyExerciseScreen}
+            options={{
+              headerShown: false,
+            }}
+          />
+        </Stack.Navigator>
+      </>
+    );
+  };
   const WordStack = () => {
     return (
       <Stack.Navigator>
@@ -165,9 +186,10 @@ export default function MainTabNavigator() {
       ></Tab.Screen>
       <Tab.Screen
         name="wordProgressScreen"
-        component={ReviewWordsList}
+        component={wordProgressStack}
         options={{
           title: "SM2",
+          headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <Icon size={size} color={color} name="book" />
           ),

@@ -31,6 +31,7 @@ import {
 } from "react-native-paper";
 import { Audio } from "expo-av";
 import { authApis, endpoints } from "../../configs/Apis";
+import VocabularyExerciseScreen from "../vocabularylist/VocabularyExerciseScreen";
 
 const { width } = Dimensions.get("window");
 
@@ -271,7 +272,7 @@ const ReviewWordsList = ({ navigation }) => {
 
     return (
       <Card
-        key={word.wordId}
+        key={word.Id}
         style={[styles.wordCard, isOverdue && styles.overdueCard]}
       >
         <Card.Content>
@@ -385,7 +386,9 @@ const ReviewWordsList = ({ navigation }) => {
               mode="contained"
               icon="refresh"
               onPress={() => {
-                navigation.navigate("QuickReview", { word });
+                navigation.navigate("VocabularyExercise", {
+                  word: word,
+                });
               }}
               style={styles.reviewButton}
               compact
