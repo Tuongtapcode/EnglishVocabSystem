@@ -23,21 +23,27 @@ pipeline {
 
         stage('Prepare Maven Wrapper') {
             steps {
-                // Cấp quyền thực thi cho mvnw trên Linux agent
-                sh 'chmod +x mvnw'
+                dir('englishvocabsystem') {
+                    // Cấp quyền thực thi cho mvnw trên Linux agent
+                    sh 'chmod +x mvnw'
+                }
             }
         }
 
         stage('Maven Test') {
             steps {
-                sh './mvnw clean test'
+                dir('englishvocabsystem') {
+                    sh './mvnw clean test'
+                }
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
-                sh "docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest"
+                dir('englishvocabsystem') {
+                    sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
+                    sh "docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest"
+                }
             }
         }
 
@@ -48,18 +54,19 @@ pipeline {
                 }
             }
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                dir('englishvocabsystem') {
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                    }
+                    sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
+                    sh "docker push ${IMAGE_NAME}:latest"
                 }
-                sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
-                sh "docker push ${IMAGE_NAME}:latest"
             }
         }
 
         stage('Trigger Render Deploy') {
             when {
                 expression {
-                    // Chỉ chạy nếu biến RENDER_DEPLOY_HOOK đã khai báo
                     return env.RENDER_DEPLOY_HOOK?.trim()
                 }
             }
