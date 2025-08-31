@@ -37,6 +37,7 @@ public class SpringSecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll() // login/register
                         .requestMatchers("/api/secure/**").authenticated()
                         .requestMatchers("/" ).hasRole("ADMIN")
+                        .requestMatchers("/actuator/health").permitAll() // <-- thêm dòng này
                         .anyRequest().permitAll()
                 )
                 .formLogin(form -> form
