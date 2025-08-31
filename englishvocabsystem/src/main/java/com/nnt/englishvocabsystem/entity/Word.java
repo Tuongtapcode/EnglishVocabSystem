@@ -1,5 +1,6 @@
 package com.nnt.englishvocabsystem.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.nnt.englishvocabsystem.enums.Level;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -40,6 +41,7 @@ public class Word {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "category_id", nullable = false)
+    @JsonBackReference
     private Category category;
 
     @Lob

@@ -42,7 +42,7 @@ public class ApiCategoryController {
         return ResponseEntity.ok(categoryService.getCategoryStats(id));
     }
 
-    @GetMapping("/{id}/words")
+    @GetMapping("/{id}/word")
     public ResponseEntity<List<Word>> getWordsByCategory(@PathVariable Integer id) {
         List<Word> words = wordService.getWordsByCategoryId(id);
         return ResponseEntity.ok(words);

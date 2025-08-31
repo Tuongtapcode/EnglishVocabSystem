@@ -4,8 +4,6 @@ pipeline {
     environment {
         IMAGE_NAME = 'nguyentuong/englishvocabsystem'
         IMAGE_TAG = "${BUILD_NUMBER}"
-        // RENDER_DEPLOY_HOOK có thể chưa khai báo lần đầu
-        // RENDER_DEPLOY_HOOK = 'https://api.render.com/deploy/srv-xxxx?key=YOUR_KEY'
     }
 
     stages {
@@ -24,7 +22,6 @@ pipeline {
         stage('Prepare Maven Wrapper') {
             steps {
                 dir('englishvocabsystem') {
-                    // Cấp quyền thực thi cho mvnw trên Linux agent
                     sh 'chmod +x mvnw'
                 }
             }
@@ -48,14 +45,9 @@ pipeline {
         }
 
         stage('Docker Login & Push') {
-//             when {
-//                 expression {
-//                     return env.BRANCH_NAME == 'main' || env.GIT_BRANCH == 'origin/main'
-//                 }
-//             }
             when {
                 expression {
-                    return true  // bỏ qua điều kiện branch để test
+                    return true  // chạy luôn bất kể branch
                 }
             }
             steps {
@@ -66,18 +58,6 @@ pipeline {
                     sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
                     sh "docker push ${IMAGE_NAME}:latest"
                 }
-            }
-        }
-
-        stage('Trigger Render Deploy') {
-            when {
-                expression {
-                    return env.RENDER_DEPLOY_HOOK?.trim()
-                }
-            }
-            steps {
-                echo "Triggering Render deploy via Deploy Hook..."
-                sh "curl -X POST ${RENDER_DEPLOY_HOOK}"
             }
         }
     }
