@@ -21,6 +21,13 @@ pipeline {
             }
         }
 
+        stage('Prepare Maven Wrapper') {
+            steps {
+                // Cấp quyền thực thi cho mvnw trên Linux agent
+                sh 'chmod +x mvnw'
+            }
+        }
+
         stage('Maven Test') {
             steps {
                 sh './mvnw clean test'
