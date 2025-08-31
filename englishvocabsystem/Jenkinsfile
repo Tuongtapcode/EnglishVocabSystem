@@ -48,9 +48,14 @@ pipeline {
         }
 
         stage('Docker Login & Push') {
+//             when {
+//                 expression {
+//                     return env.BRANCH_NAME == 'main' || env.GIT_BRANCH == 'origin/main'
+//                 }
+//             }
             when {
                 expression {
-                    return env.BRANCH_NAME == 'main' || env.GIT_BRANCH == 'origin/main'
+                    return true  // bỏ qua điều kiện branch để test
                 }
             }
             steps {
