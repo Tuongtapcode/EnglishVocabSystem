@@ -14,13 +14,14 @@ import QuickLearningScreen from "../components/vocabularylist/QuickLearningScree
 import VocabularyExerciseScreen from "../components/vocabularylist/VocabularyExerciseScreen";
 import SessionResultScreen from "../components/vocabularylist/SessionResultScreen";
 import ReviewWordsList from "../components/wordprogress/ReviewWordsList";
+import Profile from "../components/User/Profile";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 export default function MainTabNavigator() {
   const user = useContext(MyUserContext);
-  const dispatch = useContext(MyDispatchContext);
+  // const dispatch = useContext(MyDispatchContext);
   console.log("user", user);
   const wordProgressStack = () => {
     return (
@@ -192,6 +193,17 @@ export default function MainTabNavigator() {
           headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <Icon size={size} color={color} name="book" />
+          ),
+        }}
+      ></Tab.Screen>
+      <Tab.Screen
+        name="profileScreen"
+        component={Profile}
+        options={{
+          title: "Profile",
+          headerShown:  true,
+          tabBarIcon: ({ color, size }) => (
+            <Icon size={size} color={color} name="account" />
           ),
         }}
       ></Tab.Screen>
