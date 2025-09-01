@@ -1,0 +1,77 @@
+pipeline {
+    agent any
+
+    environment {
+        IMAGE_NAME = 'nguyentuong/englishvocabsystem'
+        IMAGE_TAG = "${BUILD_NUMBER}"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: 'feature/cicd']],
+                    userRemoteConfigs: [[
+                        url: 'https://github.com/Tuongtapcode/EnglishVocabSystem.git'
+                    ]]
+                ])
+            }
+        }
+
+        stage('Prepare Maven Wrapper') {
+            steps {
+                dir('englishvocabsystem') {
+                    sh 'chmod +x mvnw'
+                }
+            }
+        }
+
+        stage('Maven Test') {
+            steps {
+                dir('englishvocabsystem') {
+                    sh './mvnw clean test'
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                dir('englishvocabsystem') {
+                    sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
+                    sh "docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest"
+                }
+            }
+        }
+
+        stage('Docker Login & Push') {
+            when {
+                expression {
+                    return true  // chạy luôn bất kể branch
+                }
+            }
+            steps {
+                dir('englishvocabsystem') {
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                    }
+                    sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
+                    sh "docker push ${IMAGE_NAME}:latest"
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            sh 'docker system prune -f || true'
+            sh 'docker container prune -f || true'
+        }
+        success {
+            echo '✅ Pipeline completed successfully!'
+        }
+        failure {
+            echo '❌ Pipeline failed!'
+        }
+    }
+}
