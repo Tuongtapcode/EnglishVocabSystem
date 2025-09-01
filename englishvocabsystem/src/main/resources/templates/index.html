@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - English Learning App</title>
+    <th:context th:replace="base :: resources">
+
+    </th:context>
+
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div th:replace="base :: sidebar"></div>
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div th:replace="base :: top-bar"></div>
+
+        <div class="content-area">
+            <!-- Dashboard Content -->
+
+            <div id="dashboard-content" class="page-content fade-in">
+                <h1 class="page-title">Dashboard Overview</h1>
+
+                <!-- Stats Cards -->
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-3 col-md-6">
+                        <div class="stats-card">
+                            <div class="stats-icon" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stats-number">1,247</div>
+                            <div class="stats-label">Người dùng</div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="stats-card">
+                            <div class="stats-icon" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div class="stats-number">3,856</div>
+                            <div class="stats-label">Từ vựng</div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="stats-card">
+                            <div class="stats-icon" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">
+                                <i class="fas fa-dumbbell"></i>
+                            </div>
+                            <div class="stats-number">892</div>
+                            <div class="stats-label">Bài tập</div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="stats-card">
+                            <div class="stats-icon" style="background: linear-gradient(135deg, #43e97b, #38f9d7);">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="stats-number">15,647</div>
+                            <div class="stats-label">Phiên học</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="row g-4">
+                    <div class="col-lg-8">
+                        <div class="chart-container">
+                            <h5 class="mb-4 fw-bold">Hoạt động người dùng (7 ngày qua)</h5>
+                            <canvas id="userActivityChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="chart-container">
+                            <h5 class="mb-4 fw-bold">Phân loại người dùng</h5>
+                            <canvas id="userTypeChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activities -->
+                <div class="table-container mt-4">
+                    <div class="table-header">
+                        <h5 class="mb-0">Hoạt động gần đây</h5>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Người dùng</th>
+                                    <th>Hoạt động</th>
+                                    <th>Thời gian</th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"
+                                                alt="User" class="user-avatar me-3">
+                                            <div>
+                                                <div class="fw-semibold">Nguyễn Văn A</div>
+                                                <div class="text-muted small">user@example.com</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Hoàn thành bài tập Grammar Basics</td>
+                                    <td>5 phút trước</td>
+                                    <td><span class="badge bg-success">Thành công</span></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"
+                                                alt="User" class="user-avatar me-3">
+                                            <div>
+                                                <div class="fw-semibold">Trần Thị B</div>
+                                                <div class="text-muted small">user2@example.com</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Thêm từ vựng mới vào danh sách</td>
+                                    <td>12 phút trước</td>
+                                    <td><span class="badge bg-info">Hoạt động</span></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"
+                                                alt="User" class="user-avatar me-3">
+                                            <div>
+                                                <div class="fw-semibold">Lê Văn C</div>
+                                                <div class="text-muted small">user3@example.com</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Đăng ký tài khoản Premium</td>
+                                    <td>1 giờ trước</td>
+                                    <td><span class="badge bg-warning">Chờ xử lý</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/js/script.js}"></script>
+</body>
+
+</html>
