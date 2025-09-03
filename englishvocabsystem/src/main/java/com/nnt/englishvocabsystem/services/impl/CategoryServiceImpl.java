@@ -6,6 +6,7 @@ import com.nnt.englishvocabsystem.enums.Level;
 import com.nnt.englishvocabsystem.repositories.CategoryRepository;
 import com.nnt.englishvocabsystem.repositories.WordRepository;
 import com.nnt.englishvocabsystem.services.CategoryService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,7 +31,10 @@ public class CategoryServiceImpl implements CategoryService {
         this.wordRepository = wordRepository;
     }
 
-
+    @Override
+    public  List<Category> getAllCategories() {
+        return categoryRepository.findAll();
+    }
     @Override
     public Page<Category> getAllCategories(Map<String, String> params) {
         int page = Integer.parseInt(params.getOrDefault("page", "0"));
@@ -65,7 +69,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Category getCategoryById(Integer id) {
         return categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Category not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Category not found with id: " + id));
     }
 
     @Override

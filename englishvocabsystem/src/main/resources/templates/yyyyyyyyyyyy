@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - English Learning App</title>
+    <th:context th:replace="~{base :: resources}">
+
+    </th:context>
+
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div th:replace="~{base :: sidebar}"></div>
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div th:replace="~{base :: top-bar}"></div>
+
+        <div class="content-area">
+
+        </div>
+    </div>
+    <script th:src="@{/js/main.js}"></script>
+
+
+</body>
+
+</html>

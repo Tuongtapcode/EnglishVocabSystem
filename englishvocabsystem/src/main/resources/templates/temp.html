@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,7 +33,7 @@
             width: 280px;
             height: 100vh;
             background: linear-gradient(180deg, #1a202c 0%, #2d3748 100%);
-            box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
             z-index: 1000;
             transition: all 0.3s ease;
             overflow-y: auto;
@@ -93,7 +94,8 @@
             display: none;
         }
 
-        .nav-link:hover, .nav-link.active {
+        .nav-link:hover,
+        .nav-link.active {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
             transform: translateX(5px);
@@ -149,7 +151,7 @@
             background: white;
             border-radius: 1rem;
             padding: 2rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             border: none;
             position: relative;
             overflow: hidden;
@@ -168,7 +170,7 @@
 
         .stats-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
         }
 
         .stats-icon {
@@ -201,7 +203,7 @@
             background: white;
             border-radius: 1rem;
             padding: 2rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             margin-top: 2rem;
         }
 
@@ -209,7 +211,7 @@
             background: white;
             border-radius: 1rem;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
 
         .table-header {
@@ -255,7 +257,7 @@
 
         .btn-action:hover {
             transform: scale(1.05);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         .modal-header {
@@ -288,7 +290,7 @@
             font-size: 2rem;
             font-weight: bold;
             margin-bottom: 2rem;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
 
         .notification-badge {
@@ -315,7 +317,7 @@
 
         .dropdown-menu {
             border: none;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             border-radius: 0.5rem;
         }
 
@@ -323,11 +325,11 @@
             .sidebar {
                 transform: translateX(-100%);
             }
-            
+
             .sidebar.show {
                 transform: translateX(0);
             }
-            
+
             .main-content {
                 margin-left: 0;
             }
@@ -342,6 +344,7 @@
                 opacity: 0;
                 transform: translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -369,11 +372,17 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
     </style>
 </head>
+
 <body>
     <!-- Sidebar -->
     <nav class="sidebar" id="sidebar">
@@ -459,16 +468,19 @@
                 </div>
                 <div class="dropdown">
                     <a href="#" class="d-flex align-items-center text-decoration-none" data-bs-toggle="dropdown">
-                        <img src="https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png" 
-                             alt="Admin" class="user-avatar me-2">
+                        <img src="https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png" alt="Admin"
+                            class="user-avatar me-2">
                         <span class="text-dark fw-semibold">Admin</span>
                         <i class="fas fa-chevron-down ms-2 text-muted"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
                         <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Cài đặt</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-sign-out-alt me-2"></i>Đăng
+                                xuất</a></li>
                     </ul>
                 </div>
             </div>
@@ -479,7 +491,7 @@
             <!-- Dashboard Content -->
             <div id="dashboard-content" class="page-content fade-in">
                 <h1 class="page-title">Dashboard Overview</h1>
-                
+
                 <!-- Stats Cards -->
                 <div class="row g-4 mb-4">
                     <div class="col-lg-3 col-md-6">
@@ -539,7 +551,7 @@
                 <!-- Recent Activities -->
                 <div class="table-container mt-4">
                     <div class="table-header">
-                        <h5 class="mb-0">Hoạt động gần đây</h5>
+                        <h5 class="mb-0">Phie động gần đây</h5>
                     </div>
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">
@@ -555,8 +567,8 @@
                                 <tr>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <img src="https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png" 
-                                                 alt="User" class="user-avatar me-3">
+                                            <img src="https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"
+                                                alt="User" class="user-avatar me-3">
                                             <div>
                                                 <div class="fw-semibold">Nguyễn Văn A</div>
                                                 <div class="text-muted small">user@example.com</div>
@@ -570,8 +582,8 @@
                                 <tr>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <img src="https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png" 
-                                                 alt="User" class="user-avatar me-3">
+                                            <img src="https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"
+                                                alt="User" class="user-avatar me-3">
                                             <div>
                                                 <div class="fw-semibold">Trần Thị B</div>
                                                 <div class="text-muted small">user2@example.com</div>
@@ -585,8 +597,8 @@
                                 <tr>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <img src="https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png" 
-                                                 alt="User" class="user-avatar me-3">
+                                            <img src="https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"
+                                                alt="User" class="user-avatar me-3">
                                             <div>
                                                 <div class="fw-semibold">Lê Văn C</div>
                                                 <div class="text-muted small">user3@example.com</div>
@@ -612,7 +624,8 @@
                             <i class="fas fa-plus me-2"></i>Thêm người dùng
                         </button>
                         <div class="dropdown">
-                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button"
+                                data-bs-toggle="dropdown">
                                 <i class="fas fa-filter me-2"></i>Lọc
                             </button>
                             <ul class="dropdown-menu">
@@ -653,7 +666,8 @@
                                     <td>1</td>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <img src="https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png" alt="User" class="user-avatar me-3">
+                                            <img src="https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"
+                                                alt="User" class="user-avatar me-3">
                                             <div>
                                                 <div class="fw-semibold">Nguyễn Văn A</div>
                                                 <div class="text-muted small">@nguyenvana</div>
@@ -906,7 +920,7 @@
         let sidebarCollapsed = false;
 
         // Initialize page
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             initializeCharts();
             setupEventListeners();
             loadPageData('dashboard');
@@ -916,10 +930,10 @@
         function setupEventListeners() {
             // Sidebar toggle
             document.getElementById('toggleSidebar').addEventListener('click', toggleSidebar);
-            
+
             // Navigation links
             document.querySelectorAll('.nav-link').forEach(link => {
-                link.addEventListener('click', function(e) {
+                link.addEventListener('click', function (e) {
                     e.preventDefault();
                     const page = this.getAttribute('data-page');
                     navigateToPage(page);
@@ -933,7 +947,7 @@
                 sidebarCollapsed = true;
             }
 
-            window.addEventListener('resize', function() {
+            window.addEventListener('resize', function () {
                 if (window.innerWidth <= 768) {
                     if (!sidebarCollapsed) {
                         toggleSidebar();
@@ -943,14 +957,6 @@
         }
 
         // Toggle sidebar
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const mainContent = document.getElementById('mainContent');
-            
-            sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
-            sidebarCollapsed = !sidebarCollapsed;
-        }
 
         // Navigate to page
         function navigateToPage(page) {
@@ -987,7 +993,7 @@
                 'analytics': 'Phân tích',
                 'settings': 'Cài đặt'
             };
-            
+
             document.getElementById('pageTitle').textContent = pageTitles[page] || page;
             currentPage = page;
 
@@ -999,7 +1005,7 @@
         function showPlaceholderPage(page) {
             const contentArea = document.querySelector('.content-area');
             const existingPlaceholder = document.getElementById('placeholder-content');
-            
+
             if (existingPlaceholder) {
                 existingPlaceholder.remove();
             }
@@ -1017,13 +1023,13 @@
                     </button>
                 </div>
             `;
-            
+
             contentArea.appendChild(placeholder);
         }
 
         // Load page specific data
         function loadPageData(page) {
-            switch(page) {
+            switch (page) {
                 case 'dashboard':
                     loadDashboardData();
                     break;
@@ -1061,7 +1067,7 @@
         function loadUsersData() {
             // Show loading state
             showLoading('users-content');
-            
+
             // Simulate API call
             setTimeout(() => {
                 hideLoading('users-content');
@@ -1073,7 +1079,7 @@
         function loadWordsData() {
             // Show loading state
             showLoading('words-content');
-            
+
             // Simulate API call
             setTimeout(() => {
                 hideLoading('words-content');
@@ -1173,7 +1179,7 @@
         function saveUser() {
             const form = document.getElementById('addUserForm');
             const formData = new FormData(form);
-            
+
             // Show loading state
             const saveBtn = event.target;
             const originalText = saveBtn.textContent;
@@ -1184,18 +1190,18 @@
             setTimeout(() => {
                 // In a real app, send data to server
                 console.log('User data:', Object.fromEntries(formData));
-                
+
                 // Reset form and close modal
                 form.reset();
                 bootstrap.Modal.getInstance(document.getElementById('addUserModal')).hide();
-                
+
                 // Show success message
                 showNotification('Thêm người dùng thành công!', 'success');
-                
+
                 // Reset button
                 saveBtn.textContent = originalText;
                 saveBtn.disabled = false;
-                
+
                 // Reload users data
                 if (currentPage === 'users') {
                     loadUsersData();
@@ -1207,7 +1213,7 @@
         function saveWord() {
             const form = document.getElementById('addWordForm');
             const formData = new FormData(form);
-            
+
             // Show loading state
             const saveBtn = event.target;
             const originalText = saveBtn.textContent;
@@ -1218,18 +1224,18 @@
             setTimeout(() => {
                 // In a real app, send data to server
                 console.log('Word data:', Object.fromEntries(formData));
-                
+
                 // Reset form and close modal
                 form.reset();
                 bootstrap.Modal.getInstance(document.getElementById('addWordModal')).hide();
-                
+
                 // Show success message
                 showNotification('Thêm từ vựng thành công!', 'success');
-                
+
                 // Reset button
                 saveBtn.textContent = originalText;
                 saveBtn.disabled = false;
-                
+
                 // Reload words data
                 if (currentPage === 'words') {
                     loadWordsData();
@@ -1247,9 +1253,9 @@
                 ${message}
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             `;
-            
+
             document.body.appendChild(notification);
-            
+
             // Auto remove after 5 seconds
             setTimeout(() => {
                 if (notification.parentNode) {
@@ -1263,7 +1269,7 @@
             if (confirm(`Bạn có chắc chắn muốn xóa ${type} này?`)) {
                 // In a real app, make API call to delete
                 showNotification(`Đã xóa ${type} thành công!`, 'success');
-                
+
                 // Reload current page data
                 loadPageData(currentPage);
             }
@@ -1272,7 +1278,7 @@
         // Export data
         function exportData(type) {
             showNotification(`Đang xuất dữ liệu ${type}...`, 'info');
-            
+
             // Simulate export process
             setTimeout(() => {
                 showNotification(`Xuất dữ liệu ${type} thành công!`, 'success');
@@ -1282,12 +1288,12 @@
         // Search functionality
         function setupSearch() {
             const searchInputs = document.querySelectorAll('input[placeholder*="Tìm kiếm"]');
-            
+
             searchInputs.forEach(input => {
-                input.addEventListener('input', function() {
+                input.addEventListener('input', function () {
                     const searchTerm = this.value.toLowerCase();
                     const table = this.closest('.page-content').querySelector('table tbody');
-                    
+
                     if (table) {
                         const rows = table.querySelectorAll('tr');
                         rows.forEach(row => {
@@ -1306,20 +1312,20 @@
         function refreshData() {
             showNotification('Đang làm mới dữ liệu...', 'info');
             loadPageData(currentPage);
-            
+
             setTimeout(() => {
                 showNotification('Dữ liệu đã được cập nhật!', 'success');
             }, 1000);
         }
 
         // Add keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             // Ctrl/Cmd + B to toggle sidebar
             if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
                 e.preventDefault();
                 toggleSidebar();
             }
-            
+
             // Ctrl/Cmd + N to add new item
             if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
                 e.preventDefault();
@@ -1329,7 +1335,7 @@
                     bootstrap.Modal.getInstance(document.getElementById('addWordModal')).show();
                 }
             }
-            
+
             // F5 to refresh data
             if (e.key === 'F5') {
                 e.preventDefault();
@@ -1338,4 +1344,5 @@
         });
     </script>
 </body>
+
 </html>

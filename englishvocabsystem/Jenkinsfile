@@ -11,7 +11,7 @@ pipeline {
             steps {
                 checkout([
                     $class: 'GitSCM',
-                    branches: [[name: 'feature/cicd']],
+                    branches: [[name: 'develop']],
                     userRemoteConfigs: [[
                         url: 'https://github.com/Tuongtapcode/EnglishVocabSystem.git'
                     ]]

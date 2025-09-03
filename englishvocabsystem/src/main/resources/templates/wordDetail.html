@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - English Learning App</title>
+    <th:context th:replace="~{base :: resources}">
+    </th:context>
+    <style>
+        .card {
+            border: none;
+            border-radius: 1rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 1rem 1rem 0 0;
+            padding: 1.5rem;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .form-section:last-of-type {
+            border-bottom: none;
+            margin-bottom: 1rem;
+        }
+
+        .form-section h5 {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .form-control,
+        .form-select {
+            border: 2px solid #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+            outline: none;
+        }
+
+        .form-control.is-invalid,
+        .form-select.is-invalid {
+            border-color: var(--danger-color);
+            box-shadow: 0 0 0 0.2rem rgba(239, 68, 68, 0.25);
+        }
+
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .readonly-field {
+            background-color: #f8f9fa;
+            opacity: 0.8;
+        }
+
+        .btn-outline-secondary:hover,
+        .btn-outline-danger:hover {
+            transform: translateY(-2px);
+        }
+
+        .text-danger {
+            font-size: 0.875rem;
+        }
+
+        .preview-section {
+            background: #f8fafc;
+            border: 2px dashed #d1d5db;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div th:replace="~{base :: sidebar}"></div>
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div th:replace="~{base :: top-bar}"></div>
+
+        <div class="content-area">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card shadow">
+                        <div class="card-header text-center">
+                            <h3 class="mb-0">
+                                <i class="fas fa-book me-2"></i>
+                                Quản lý từ vựng
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <form th:action="@{/words}" method="post" enctype="multipart/form-data" th:object="${word}">
+                                <input type="hidden" th:field="*{id}" />
+                                <!-- Thông tin cơ bản -->
+                                <div class="form-section">
+                                    <h5 class="text-primary mb-3">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Thông tin cơ bản
+                                    </h5>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="englishWord" class="form-label">Từ
+                                                    tiếng Anh<span class="text-danger">*</span></label>
+                                                <input th:field="*{englishWord}" type="text" class="form-control"
+                                                    id="englishWord" name="englishWord" required maxlength="100"
+                                                    placeholder="Nhập từ tiếng Anh...">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="vietnameseMeaning" class="form-label">Nghĩa tiếng
+                                                    Việt<span class="text-danger">*</span></label>
+                                                <input th:field="*{vietnameseMeaning}" type="text" class="form-control"
+                                                    id="vietnameseMeaning" name="vietnameseMeaning" required
+                                                    maxlength="100" placeholder="Nhập nghĩa tiếng Việt...">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="pronunciation" class="form-label">Phiên âm</label>
+                                                <input th:field="*{pronunciation}" type="text" class="form-control"
+                                                    id="pronunciation" name="pronunciation" maxlength="200"
+                                                    placeholder="VD: /həˈloʊ/">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="wordType" class="form-label">Loại từ<span
+                                                        class="text-danger">*</span></label>
+                                                <select th:field="*{wordType}" class="form-select" id="wordType"
+                                                    name="wordType" required>
+                                                    <option value="">Chọn loại từ...</option>
+                                                    <option value="NOUN">Danh từ (Noun)</option>
+                                                    <option value="VERB">Động từ (Verb)</option>
+                                                    <option value="ADJECTIVE">Tính từ (Adjective)</option>
+                                                    <option value="ADVERB">Trạng từ (Adverb)</option>
+                                                    <option value="PRONOUN">Đại từ (Pronoun)</option>
+                                                    <option value="PREPOSITION">Giới từ (Preposition)</option>
+                                                    <option value="CONJUNCTION">Liên từ (Conjunction)</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="level" class="form-label">Cấp độ<span
+                                                        class="text-danger">*</span></label>
+                                                <select th:field="*{level}" class="form-select" id="level" name="level"
+                                                    required>
+                                                    <option value="">Chọn cấp độ...</option>
+                                                    <option value="A1">A1 - Sơ cấp</option>
+                                                    <option value="A2">A2 - Cơ bản</option>
+                                                    <option value="B1">B1 - Trung cấp thấp</option>
+                                                    <option value="B2">B2 - Trung cấp cao</option>
+                                                    <option value="C1">C1 - Cao cấp</option>
+                                                    <option value="C2">C2 - Thành thạo</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="category" class="form-label">Danh mục<span
+                                                        class="text-danger">*</span></label>
+                                                <select th:field="*{category.id}" class="form-select" id="category"
+                                                    name="category" required>
+                                                    <option value="">Chọn danh mục...</option>
+                                                    <option th:each="cate: ${categories}" th:value="${cate.id}"
+                                                        th:text="${cate.name}"></option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <!-- Câu ví dụ -->
+                                <div class="form-section">
+                                    <h5 class="text-primary mb-3">
+                                        <i class="fas fa-quote-left me-2"></i>
+                                        Câu ví dụ
+                                    </h5>
+
+                                    <div class="mb-3">
+                                        <label for="exampleSentenceEn" class="form-label">Câu ví dụ tiếng
+                                            Anh</label>
+                                        <textarea th:field="*{exampleSentenceEn}" class="form-control"
+                                            id="exampleSentenceEn" name="exampleSentenceEn" rows="3"
+                                            placeholder="Nhập câu ví dụ tiếng Anh..."></textarea>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="exampleSentenceVi" class="form-label">Câu ví dụ tiếng
+                                            Việt</label>
+                                        <textarea th:field="*{exampleSentenceVi}" class="form-control"
+                                            id="exampleSentenceVi" name="exampleSentenceVi" rows="3"
+                                            placeholder="Nhập câu ví dụ tiếng Việt..."></textarea>
+                                    </div>
+                                </div>
+
+                                <!-- Media -->
+                                <div class="form-section">
+                                    <h5 class="text-primary mb-3">
+                                        <i class="fas fa-photo-video me-2"></i>
+                                        Media
+                                    </h5>
+
+                                    <!-- Nhập URL trực tiếp -->
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="imageUrl" class="form-label">URL hình ảnh</label>
+                                                <input th:field="*{imageUrl}" type="url" class="form-control"
+                                                    id="imageUrl" maxlength="500"
+                                                    placeholder="https://example.com/image.jpg">
+                                            </div>
+
+                                            <!-- Preview khi có imageUrl -->
+                                            <div class="preview-section mt-2" th:if="${word.imageUrl != null}">
+                                                <img th:src="${word.imageUrl}" alt="Ảnh hiện tại"
+                                                    class="img-fluid rounded" style="max-height: 200px;">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="audioUrl" class="form-label">URL âm thanh</label>
+                                                <input th:field="*{audioUrl}" type="url" class="form-control"
+                                                    id="audioUrl" maxlength="500"
+                                                    placeholder="https://example.com/audio.mp3">
+                                            </div>
+
+                                            <!-- Preview khi có audioUrl -->
+                                            <div class="preview-section mt-2" th:if="${word.audioUrl != null}">
+                                                <audio controls class="w-100" style="max-width: 300px;">
+                                                    <source th:src="${word.audioUrl}" type="audio/mpeg">
+                                                    Trình duyệt không hỗ trợ audio.
+                                                </audio>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Upload file -->
+                                    <div class="row mt-3">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="imageFile" class="form-label">Hoặc tải lên hình ảnh</label>
+                                                <input th:field="*{imageFile}" type="file" class="form-control"
+                                                    id="imageFile" accept="image/*">
+                                                <small class="text-muted">Định dạng: JPG, PNG, GIF (tối đa 5MB)</small>
+                                            </div>
+
+                                            <!-- Preview ảnh vừa chọn (JS hiển thị) -->
+                                            <div class="preview-section" id="imagePreview" style="display: none;">
+                                                <img id="previewImg" src="" alt="Preview" class="img-fluid rounded"
+                                                    style="max-height: 200px;">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="audioFile" class="form-label">Hoặc tải lên âm thanh</label>
+                                                <input th:field="*{audioFile}" type="file" class="form-control"
+                                                    id="audioFile" accept="audio/*">
+                                                <small class="text-muted">Định dạng: MP3, WAV, OGG (tối đa 10MB)</small>
+                                            </div>
+
+                                            <!-- Preview audio vừa chọn (JS hiển thị) -->
+                                            <div class="preview-section" id="audioPreview" style="display: none;">
+                                                <audio controls class="w-100" style="max-width: 300px;">
+                                                    <source id="previewAudio" src="" type="audio/mpeg">
+                                                    Trình duyệt không hỗ trợ audio.
+                                                </audio>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <!-- Trạng thái -->
+                                <div class="form-section">
+                                    <h5 class="text-primary mb-3">
+                                        <i class="fas fa-cogs me-2"></i>
+                                        Trạng thái
+                                    </h5>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="approvalStatus" class="form-label">Trạng thái
+                                                    duyệt</label>
+                                                <select th:field="*{approvalStatus}" class="form-select"
+                                                    id="approvalStatus" name="approvalStatus">
+                                                    <option value="PENDING" selected>Chờ duyệt</option>
+                                                    <option value="APPROVED">Đã duyệt</option>
+                                                    <option value="REJECTED">Từ chối</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="isActive" class="form-label">Trạng thái hoạt
+                                                    động</label>
+                                                <div class="form-check form-switch">
+                                                    <input th:field="*{isActive}" class="form-check-input"
+                                                        type="checkbox" id="isActive" name="isActive" checked>
+                                                    <label class="form-check-label" for="isActive">
+                                                        <span id="status-text">Đang hoạt động</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Thời gian -->
+                                <div class="form-section">
+                                    <h5 class="text-primary mb-3">
+                                        <i class="fas fa-clock me-2"></i>
+                                        Thông tin thời gian
+                                    </h5>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="created_at" class="form-label">Ngày tạo</label>
+                                                <input type="datetime-local" class="form-control readonly-field"
+                                                    id="created_at" name="created_at" readonly disabled
+                                                    th:value="${#temporals.format(word.createdAt, 'yyyy-MM-dd''T''HH:mm')}" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="updated_at" class="form-label">Cập nhật lần cuối</label>
+                                                <input type="datetime-local" class="form-control readonly-field"
+                                                    id="updated_at" name="updated_at" readonly disabled
+                                                    th:value="${#temporals.format(word.updatedAt, 'yyyy-MM-dd''T''HH:mm')}" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Nút hành động -->
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-primary btn-lg me-2">
+
+                                        <span th:if="${word.id == null}">
+                                            <i class="fas fa-plus me-2"></i>
+                                            Thêm từ vựng</span>
+                                        <span th:if="${word.id != null}">
+                                            <i class="fas fa-save me-2"></i>
+                                            Cập nhật từ vựng</span>
+                                    </button>
+
+                                    <button type="button" class="btn btn-outline-info btn-lg me-2"
+                                        onclick="togglePreview()">
+                                        <i class="fas fa-eye me-2"></i>
+                                        Xem trước
+                                    </button>
+
+                                    <a href="/admin/words" class="btn btn-outline-secondary btn-lg me-2">
+                                        <i class="fas fa-arrow-left me-2"></i>
+                                        Quay lại
+                                    </a>
+
+                                    <button type="reset" class="btn btn-outline-danger btn-lg">
+                                        <i class="fas fa-undo me-2"></i>
+                                        Đặt lại
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/js/main.js}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById("imageFile").addEventListener("change", function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (ev) {
+                    document.getElementById("previewImg").src = ev.target.result;
+                    document.getElementById("imagePreview").style.display = "block";
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById("audioFile").addEventListener("change", function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (ev) {
+                    document.getElementById("previewAudio").src = ev.target.result;
+                    document.getElementById("audioPreview").style.display = "block";
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+
+</body>
+
+</html>

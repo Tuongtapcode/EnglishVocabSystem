@@ -6,9 +6,17 @@ import com.nnt.englishvocabsystem.exceptions.DuplicateFieldException;
 import com.nnt.englishvocabsystem.repositories.UserRepository;
 
 import com.nnt.englishvocabsystem.services.UserService;
+import com.nnt.englishvocabsystem.utils.RequestParamUtils;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,9 +27,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 @Service
@@ -94,7 +102,13 @@ public class UserServiceImpl implements UserService {
 
     public boolean authenticate(String username, String password) {
         User u = this.userRepo.findByUsername(username);
-        return u != null && this.passwordEncoder.matches(password, u.getPassword());
+        if (u != null && this.passwordEncoder.matches(password, u.getPassword())) {
+            // Cập nhật lastLoginAt
+            u.setLastLoginAt(Instant.now());
+            this.userRepo.save(u);  // Lưu vào DB
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -109,5 +123,91 @@ public class UserServiceImpl implements UserService {
 
         return new org.springframework.security.core.userdetails.User(
                 u.getUsername(), u.getPassword(), authorities);
+    }
+
+    @Override
+    public Page<User> getAllUsers(Map<String, String> params) {
+        int page = RequestParamUtils.parseIntSafe(params.get("page"), 0);
+        int size = RequestParamUtils.parseIntSafe(params.get("size"), 10);
+        String sortBy = params.getOrDefault("sortBy", "id");
+        String direction = params.getOrDefault("direction", "asc");
+
+        Sort sort = Sort.by(
+                direction.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC,
+                sortBy
+        );
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Specification<User> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            // Search theo username
+            String keyword = params.get("keyword");
+            if (RequestParamUtils.hasText(keyword)) {
+                String kwLower = "%" + keyword.toLowerCase() + "%";
+                predicates.add(cb.like(cb.lower(root.get("username").as(String.class)), kwLower));
+            }
+
+            // Filter theo user_type
+            String userType = params.get("userType");
+            if (RequestParamUtils.hasText(userType)) {
+                predicates.add(
+                        cb.equal(cb.lower(root.get("userType").as(String.class)), userType.toLowerCase())
+                );
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        return userRepo.findAll(spec, pageable);
+    }
+
+    @Override
+    public void addOrUpdateUser(User user) {
+        try {
+            User existing = null;
+            if (user.getId() != null) {
+                existing = userRepo.findById(user.getId()).orElse(null);
+            }
+
+            if (existing != null) {
+                user.setCreatedAt(existing.getCreatedAt()); // giữ createdAt cũ
+                user.setLastLoginAt(existing.getLastLoginAt());
+            } else {
+                user.setCreatedAt(Instant.now());
+            }
+
+            user.setUpdatedAt(Instant.now());
+
+            // Upload avatar nếu có
+            if (user.getFileAvatar() != null && !user.getFileAvatar().isEmpty()) {
+                Map<?, ?> res = cloudinary.uploader().upload(
+                        user.getFileAvatar().getBytes(),
+                        ObjectUtils.asMap("resource_type", "auto")
+                );
+                user.setAvatar(res.get("secure_url").toString());
+            }
+
+            // Có thể hash password nếu là mới hoặc password được cập nhật
+            if (existing == null || !existing.getPassword().equals(user.getPassword())) {
+                user.setPassword(passwordEncoder.encode(user.getPassword()));
+            }
+
+            // Lưu xuống DB
+            userRepo.save(user);
+
+        } catch (IOException e) {
+            Logger.getLogger(UserServiceImpl.class.getName()).log(Level.SEVERE, null, e);
+            throw new RuntimeException("Upload avatar thất bại!", e);
+        }
+    }
+
+    @Override
+    public void deleteUserByUserName(String username) {
+        User user = userRepo.findByUsername(username);
+        if (user == null) {
+            throw new EntityNotFoundException("User với username " + username + " không tồn tại");
+        }
+        userRepo.delete(user);
     }
 }
