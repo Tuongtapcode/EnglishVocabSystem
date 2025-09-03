@@ -18,6 +18,7 @@ public class RequestParamUtils {
         return value != null && !value.trim().isEmpty();
     }
 
+
     // nếu cần thêm cho Instant
     public static Instant parseInstantSafe(String value, Instant defaultValue) {
         try {
@@ -26,4 +27,5 @@ public class RequestParamUtils {
             return defaultValue;
         }
     }
+
 }

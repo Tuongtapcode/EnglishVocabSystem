@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - English Learning App</title>
+    <th:context th:replace="~{base :: resources}">
+
+    </th:context>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div th:replace="~{base :: sidebar}"></div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div th:replace="~{base :: top-bar}"></div>
+
+        <div class="content-area">
+            <div id="users-content" class="page-content fade-in">
+                <h1 class="page-title">Quản lý người dùng</h1>
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="d-flex gap-3">
+                        <a class="btn btn-primary" th:href="@{/users/add}">
+                            <i class="fas fa-plus me-2"></i>Thêm người dùng
+                        </a>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button"
+                                data-bs-toggle="dropdown">
+                                <i class="fas fa-filter me-2"></i>Lọc
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" th:href="@{/users}">Tất cả</a></li>
+                                <li><a class="dropdown-item" th:href="@{/users?type=PREMIUM}">Premium</a></li>
+                                <li><a class="dropdown-item" th:href="@{/users?type=FREE}">Free</a></li>
+                                <li><a class="dropdown-item" th:href="@{/users?type=ADMIN}">Admin</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <form th:action="@{/users}" method="get" class="input-group" style="width: 300px;">
+                        <input type="text" name="keyword" class="form-control" placeholder="Tìm kiếm người dùng..."
+                            th:value="${keyword}">
+                        <button class="btn btn-secondary" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h5 class="mb-0">Danh sách người dùng</h5>
+                        <small class="text-muted">Tổng cộng: <span th:text="${users.totalElements}">0</span> người
+                            dùng</small>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>User</th>
+                                    <th>Email</th>
+                                    <th>Loại tài khoản</th>
+                                    <th>Ngày tạo</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="user : ${users.content}">
+                                    <td th:text="${user.id}">1</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img th:src="${user.avatar}" alt="User" class="user-avatar me-3">
+                                            <div>
+                                                <div class="fw-semibold"
+                                                    th:text="${user.firstName + ' ' + user.lastName}">Nguyễn Văn A</div>
+                                                <div class="text-muted small" th:text="${user.username}">@username</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td th:text="${user.email}">user@example.com</td>
+                                    <td>
+                                        <span th:if="${user.userType}=='FREE'" class="badge bg-success"
+                                            th:text="${user.userType}">Free</span>
+                                        <span th:if="${user.userType}=='PREMIUM'" class="badge bg-custom"
+                                            th:text="${user.userType}">Premium</span>
+                                        <span th:if="${user.userType}=='ADMIN'" class="badge bg-danger"
+                                            th:text="${user.userType}">Admin</span>
+                                    </td>
+                                    <td th:text="${user.createdAt}">2024-01-15</td>
+                                    <td>
+                                        <span th:if="${user.active}" class="badge bg-success">Hoạt động</span>
+                                        <span th:if="${!user.active}" class="badge bg-danger">Ngừng hoạt động</span>
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-action btn-edit" th:href="@{'/users/' + ${user.username}}">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button" class="btn-action btn-delete" title="Xóa"
+                                            th:attr="data-username=${user.username}" onclick="deleteUserByData(this)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <nav aria-label="User pagination" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${users.first} ? 'disabled'">
+                            <a class="page-link" th:href="@{/users(page=${users.number - 1})}">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, users.totalPages - 1)}"
+                            th:classappend="${i == users.number} ? 'active'">
+                            <a class="page-link" th:href="@{/users(page=${i})}" th:text="${i + 1}">1</a>
+                        </li>
+                        <li class="page-item" th:classappend="${users.last} ? 'disabled'">
+                            <a class="page-link" th:href="@{/users(page=${users.number + 1})}">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/main.js}"></script>
+    <script>
+        function deleteUserByData(btn) {
+            const username = btn.getAttribute('data-username');
+            if (confirm("Bạn có chắc chắn muốn xóa người dùng này?")) {
+                fetch('/api/users/' + encodeURIComponent(username), { method: "DELETE" })
+                    .then(response => {
+                        if (response.status === 204) {
+                            alert("Đã xóa người dùng thành công!");
+                            location.reload();
+                        } else {
+                            alert("Xóa thất bại!");
+                        }
+                    });
+            }
+        }
+    </script>
+</body>
+
+</html>

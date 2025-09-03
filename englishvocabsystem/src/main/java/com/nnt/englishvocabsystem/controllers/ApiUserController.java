@@ -45,4 +45,11 @@ public class ApiUserController {
     public ResponseEntity<User> getProfile(Principal principal) {
         return ResponseEntity.ok(this.userService.getUserByUsername(principal.getName()));
     }
+
+    @DeleteMapping("/users/{username}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteUser(@PathVariable(value = "username") String username) {
+        this.userService.deleteUserByUserName(username);
+    }
+
 }

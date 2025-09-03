@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - English Learning App</title>
+    <th:context th:replace="~{base :: resources}">
+
+    </th:context>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div th:replace="~{base :: sidebar}"></div>
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div th:replace="~{base :: top-bar}"></div>
+
+        <div class="content-area">
+            <!-- Dashboard Content -->
+
+            <div id="dashboard-content" class="page-content fade-in">
+                <h1 class="page-title">Dashboard Overview</h1>
+
+                <!-- Stats Cards -->
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-3 col-md-6">
+                        <div class="stats-card">
+                            <div class="stats-icon" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div th:text="${totalUser}" class="stats-number">1,247</div>
+                            <div class="stats-label">Người dùng</div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="stats-card">
+                            <div class="stats-icon" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div th:text="${totalWord}" class="stats-number">3,856</div>
+                            <div class="stats-label">Từ vựng</div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="stats-card">
+                            <div class="stats-icon" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">
+                                <i class="fas fa-question-circle"></i>
+                            </div>
+                            <div th:text="${totalQuestion}" class="stats-number">892</div>
+                            <div class="stats-label">Câu hỏi</div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="stats-card">
+                            <div class="stats-icon" style="background: linear-gradient(135deg, #43e97b, #38f9d7);">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div th:text="${totalStudySesion}" class="stats-number">15,647</div>
+                            <div class="stats-label">Phiên học</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="row g-4">
+                    <div class="col-lg-8">
+                        <div class="chart-container">
+                            <h5 class="mb-4 fw-bold">Hoạt động người dùng (7 ngày qua)</h5>
+                            <canvas id="userActivityChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="chart-container">
+                            <h5 class="mb-4 fw-bold">Phân loại người dùng</h5>
+                            <canvas id="userTypeChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activities -->
+                <div class="table-container mt-4">
+                    <div class="table-header">
+                        <h5 class="mb-0">Phiên hoạt động gần đây</h5>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Người dùng</th>
+                                    <th>Hoạt động</th>
+                                    <th>Thời gian</th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="s : ${recentSessions}">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div>
+                                                <div class="fw-semibold" th:text="${s.username}">Tên user</div>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td th:text="${s.sessionType}">Hoạt động</td>
+                                    <td th:text="${s.timeAgo}">5 phút trước</td>
+
+                                    <td>
+                                        <span class="badge"
+                                            th:classappend="${s.completed} ? ' bg-success' : ' bg-warning'"
+                                            th:text="${s.completed} ? 'Đã hoàn thành' : 'Chưa hoàn thành'">
+                                        </span>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/js/main.js}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+
+    <script th:inline="javascript">
+        window.onload = function () {
+            let stats = [[${ userTypeStats }]]; // Ví dụ {FREE=10, PREMIUM=5}
+
+            let labels = Object.keys(stats);   // ["FREE", "PREMIUM"]
+            let values = Object.values(stats); // [10, 5]
+
+            const userTypeCtx = document.getElementById('userTypeChart').getContext('2d');
+            new Chart(userTypeCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: [
+                            'rgba(99, 102, 241, 0.8)',
+                            'rgba(16, 185, 129, 0.8)'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+     
+
+        let stats2 = [[${ userActivity }]]; // {2=120, 3=190, 4=300, ...}
+
+        let labels2 = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+        let values2 = [2, 3, 4, 5, 6, 7, 1].map(d => stats2[d] || 0);
+        // map theo thứ trong tuần
+
+        const ctx2 = document.getElementById('userActivityChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'line',
+            data: {
+                labels: labels2,
+                datasets: [{
+                    label: 'Người dùng hoạt động',
+                    data: values2,
+                    borderColor: 'rgb(99, 102, 241)',
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+    </script>
+
+</body>
+
+</html>

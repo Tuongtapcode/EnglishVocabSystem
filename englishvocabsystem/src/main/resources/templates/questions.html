@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - English Learning App</title>
+    <th:context th:replace="~{base :: resources}">
+
+    </th:context>
+    <style>
+        .question-card {
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .question-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .question-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .question-type-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .type-multiple-choice {
+            background-color: #007bff;
+        }
+
+        .type-fill-blank {
+            background-color: #28a745;
+        }
+
+        .type-listening-gap {
+            background-color: #fd7e14;
+        }
+
+        .type-speaking {
+            background-color: #dc3545;
+        }
+
+        .question-content {
+            padding: 20px;
+        }
+
+        .question-text {
+            font-size: 1.1em;
+            font-weight: 500;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .media-content {
+            margin: 15px 0;
+        }
+
+        .audio-player {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .question-image {
+            max-width: 200px;
+            max-height: 150px;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+        }
+
+        .options-container {
+            margin-top: 15px;
+        }
+
+        .option-item {
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .option-correct {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+
+        .option-incorrect {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+
+        .explanation-box {
+            background-color: #e7f3ff;
+            border-left: 4px solid #007bff;
+            padding: 12px 15px;
+            margin-top: 15px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .question-actions {
+            padding: 15px 20px;
+            background-color: #f8f9fa;
+            border-radius: 0 0 12px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .filters-section {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div th:replace="~{base :: sidebar}"></div>
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div th:replace="~{base :: top-bar}"></div>
+
+        <div class="content-area">
+            <h1 class="page-title">Quản lý câu hỏi từ vựng</h1>
+
+            <div class="filters-section">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <div class="d-flex gap-3 flex-wrap">
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addQuestionModal">
+                                <i class="fas fa-plus me-2"></i>Thêm câu hỏi
+                            </button>
+                            <div class="dropdown">
+                                <button class="btn btn-outline-secondary dropdown-toggle" type="button"
+                                    data-bs-toggle="dropdown">
+                                    <i class="fas fa-filter me-2"></i>Lọc theo loại
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#" onclick="filterByType('ALL')">Tất cả</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="filterByType('MULTIPLE_CHOICE')">Trắc
+                                            nghiệm</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="filterByType('FILL_BLANK')">Điền
+                                            từ</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="filterByType('LISTENING_GAP')">Nghe
+                                            điền từ</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="filterByType('SPEAKING')">Nói</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <button class="btn btn-success">
+                                <i class="fas fa-download me-2"></i>Export
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Tìm kiếm câu hỏi...">
+                            <button class="btn btn-outline-secondary" type="button">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="questions-container">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">Danh sách câu hỏi</h5>
+                    <small class="text-muted">Tổng cộng: <span th:text="${questions.totalElements}">6</span> câu
+                        hỏi</small>
+                </div>
+                <div th:each="question:${questions.content}" class="question-card">
+
+                    <div class="question-header">
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="fw-bold">ID: <span th:text="${question.id}">2</span></span>
+                            <span class="question-type-badge">
+
+
+                                Trắc nghiệm
+                            </span>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-light" th:onclick="'editQuestion(' + ${question.id} + ')'">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" th:onclick="'deleteQuestion(' + ${question.id} + ')'">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+
+                    <div class="question-content">
+                        <div class="question-text" th:text="${question.questionText}">
+                            How do you say 'dọn dẹp, làm sạch' in English?
+                        </div>
+
+                        <div class="media-content" th:if="${question.audioUrl != null or question.imageUrl != null}">
+
+                            <div th:if="${question.audioUrl != null}" class="audio-player">
+                                <i class="fas fa-volume-up text-primary"></i>
+                                <audio controls class="flex-grow-1">
+                                    <source th:src="${question.audioUrl}" type="audio/mpeg">
+                                    Trình duyệt không hỗ trợ audio.
+                                </audio>
+                            </div>
+                            <div th:if="${question.imageUrl != null}" class="mt-2">
+                                <img th:src="${question.imageUrl}" class="question-image"
+                                    th:alt="'Question ' + ${question.id} + ' image'">
+                            </div>
+                        </div>
+                        <div th:if="${question.questionFormat == 'MULTIPLE_CHOICE'}" class="options-container">
+                            <h6 class="mb-2">Các lựa chọn:</h6>
+                            <div th:each="option:${question.options}" class="option-item"
+                                th:classappend="${option.correct} ? 'option-correct' : 'option-incorrect'">
+                                <i
+                                    th:class="${option.correct} ? 'fas fa-check-circle text-success' : 'fas fa-times-circle text-danger'"></i>
+                                <span th:text="${option.optionText}">clean</span>
+                                <span th:if="${option.correct}" class="badge bg-success ms-auto">Đáp án đúng</span>
+                            </div>
+                        </div>
+
+                        <div th:if="${question.questionFormat == 'FILL_BLANK'}" class="options-container">
+                            <h6 class="mb-2">Đáp án:</h6>
+                            <div class="option-item option-correct">
+                                <i class="fas fa-check-circle text-success"></i>
+                                <span th:text="${question.options[0].optionText}">clean</span>
+                                <span class="badge bg-success ms-auto">Đáp án đúng</span>
+                            </div>
+                        </div>
+
+                        <div th:if="${question.questionFormat == 'LISTENING_GAP'}" class="options-container">
+                            <h6 class="mb-2">Đáp án điền chỗ trống:</h6>
+                            <div class="option-item option-correct">
+                                <i class="fas fa-headphones text-primary me-2"></i>
+                                <i class="fas fa-check-circle text-success"></i>
+                                <span th:text="${question.options[0].optionText}">clean</span>
+                                <span class="badge bg-success ms-auto">Đáp án đúng</span>
+                            </div>
+                        </div>
+
+                        <div th:if="${question.questionFormat == 'SPEAKING'}" class="options-container">
+                            <h6 class="mb-2">Từ cần phát âm:</h6>
+                            <div class="option-item option-correct">
+                                <i class="fas fa-microphone text-danger me-2"></i>
+                                <i class="fas fa-check-circle text-success"></i>
+                                <span th:text="${question.options[0].optionText}">clean</span>
+                                <span class="badge bg-success ms-auto">Từ mẫu</span>
+                            </div>
+                        </div>
+
+                        <div th:if="${question.explanation != null}" class="explanation-box">
+                            <h6 class="mb-2"><i class="fas fa-lightbulb me-2"></i>Giải thích:</h6>
+                            <p class="mb-0" th:text="${question.explanation}">The word 'clean' means to tidy up or
+                                remove dirt.</p>
+                        </div>
+                    </div>
+
+                    <!-- <div class="question-actions">
+                        <div class="d-flex gap-2 align-items-center">
+                            <small class="text-muted">ID: <span th:text="${question.id}">2</span></small>
+                            <span th:if="${question.audioUrl != null}" class="badge bg-warning">
+                                <i class="fas fa-volume-up me-1"></i>Có audio
+                            </span>
+                            <span th:if="${question.imageUrl != null}" class="badge bg-info">
+                                <i class="fas fa-image me-1"></i>Có hình ảnh
+                            </span>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-primary"
+                                th:onclick="'previewQuestion(' + ${question.id} + ')'">
+                                <i class="fas fa-eye me-1"></i>Xem trước
+                            </button>
+                            <button class="btn btn-sm btn-outline-warning"
+                                th:onclick="'editQuestion(' + ${question.id} + ')'">
+                                <i class="fas fa-edit me-1"></i>Sửa
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger"
+                                th:onclick="'deleteQuestion(' + ${question.id} + ')'">
+                                <i class="fas fa-trash me-1"></i>Xóa
+                            </button>
+                        </div>
+                    </div> -->
+                </div>
+                <nav aria-label="Question pagination" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${questions.first} ? 'disabled'">
+                            <a class="page-link" th:href="@{/admin/questions(page=${questions.number - 1})}">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, questions.totalPages - 1)}"
+                            th:classappend="${i == questions.number} ? 'active'">
+                            <a class="page-link" th:href="@{/admin/questions(page=${i})}" th:text="${i + 1}">1</a>
+                        </li>
+                        <li class="page-item" th:classappend="${questions.last} ? 'disabled'">
+                            <a class="page-link" th:href="@{/admin/questions(page=${questions.number + 1})}">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        <script th:src="@{/js/main.js}"></script>
+
+
+</body>
+
+</html>

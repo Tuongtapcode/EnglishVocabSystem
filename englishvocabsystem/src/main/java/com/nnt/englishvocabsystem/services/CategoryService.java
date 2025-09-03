@@ -9,6 +9,7 @@ import java.util.Map;
 
 
 public interface CategoryService {
+    List<Category> getAllCategories();
     Page<Category> getAllCategories(Map<String, String> params);
 
     Category getCategoryById(Integer id);

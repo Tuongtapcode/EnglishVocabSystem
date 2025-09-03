@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - English Learning App</title>
+    <th:context th:replace="~{base :: resources}">
+
+    </th:context>
+    <style>
+        .category-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+        }
+
+        .category-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .category-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .category-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 4px;
+            font-size: 1.1em;
+        }
+
+        .category-description {
+            font-size: 0.9em;
+            color: #6c757d;
+            margin: 0;
+        }
+
+        .status-active {
+            background-color: #28a745 !important;
+        }
+
+        .status-inactive {
+            background-color: #dc3545 !important;
+        }
+
+        .created-date {
+            font-size: 0.85em;
+            color: #6c757d;
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+            border-top: none;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div th:replace="~{base :: sidebar}"></div>
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div th:replace="~{base :: top-bar}"></div>
+
+        <div class="content-area">
+            <div id="category-content" class="page-content fade-in">
+                <h1 class="page-title">Quản lý danh mục</h1>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="d-flex gap-3">
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                            <i class="fas fa-plus me-2"></i>Thêm danh mục
+                        </button>
+                        <button class="btn btn-success">
+                            <i class="fas fa-upload me-2"></i>Import Excel
+                        </button>
+                        <button class="btn btn-info">
+                            <i class="fas fa-download me-2"></i>Export Excel
+                        </button>
+                    </div>
+                    <div class="input-group" style="width: 300px;">
+                        <input type="text" class="form-control" placeholder="Tìm kiếm danh mục...">
+                        <button class="btn btn-outline-secondary" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h5 class="mb-0">Danh sách danh mục</h5>
+                        <small class="text-muted">Tổng cộng: <span th:text="${categories.totalElements}">25</span> danh
+                            mục</small>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th style="width: 80px;">ID</th>
+                                    <th style="width: 300px;">Thông tin danh mục</th>
+                                    <th style="width: 150px;">Trạng thái</th>
+                                    <th style="width: 150px;">Ngày tạo</th>
+                                    <th style="width: 150px;">Cập nhật lần cuối</th>
+                                    <th style="width: 120px;">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="category:${categories.content}">
+                                    <td class="align-middle">
+                                        <span class="fw-bold text-primary" th:text="${category.id}">1</span>
+                                    </td>
+                                    <td class="align-middle">
+                                        <div class="category-info">
+                                            <img th:src="@{${category.image}}" th:alt="${category.name}"
+                                                class="category-image"
+                                                onerror="this.src='/images/default-category.png'">
+                                            <div class="category-details">
+                                                <div class="category-name" th:text="${category.name}">Greetings</div>
+                                                <div class="category-description" th:text="${category.description}">
+                                                    Common greeting expressions</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="align-middle">
+                                        <span class="badge fs-6 px-3 py-2"
+                                            th:classappend="${category.isActive} ? 'status-active' : 'status-inactive'"
+                                            th:text="${category.isActive} ? 'Hoạt động' : 'Không hoạt động'">
+                                            Hoạt động
+                                        </span>
+                                    </td>
+                                    <td class="align-middle">
+                                        <div class="created-date">
+                                            <i class="fas fa-calendar-plus me-1"></i>
+                                            <span
+                                                th:text="${#temporals.format(category.createdAt, 'dd/MM/yyyy HH:mm')}">25/12/2024
+                                                10:30</span>
+                                        </div>
+                                    </td>
+                                    <td class="align-middle">
+                                        <div class="created-date">
+                                            <i class="fas fa-clock me-1"></i>
+                                            <span
+                                                th:text="${#temporals.format(category.updatedAt, 'dd/MM/yyyy HH:mm')}">28/12/2024
+                                                15:45</span>
+                                        </div>
+                                    </td>
+                                    <td class="align-middle">
+                                        <div class="d-flex gap-2">
+                                            <button class="btn btn-sm btn-outline-warning"
+                                                th:onclick="'editCategory(' + ${category.id} + ')'" title="Chỉnh sửa">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger"
+                                                th:onclick="'deleteCategory(' + ${category.id} + ')'" title="Xóa">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-info"
+                                                th:onclick="'viewWords(' + ${category.id} + ')'" title="Xem từ vựng">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <nav aria-label="Category pagination" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${categories.first} ? 'disabled'">
+                            <a class="page-link" th:href="@{/admin/categories(page=${categories.number - 1})}">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, categories.totalPages - 1)}"
+                            th:classappend="${i == categories.number} ? 'active'">
+                            <a class="page-link" th:href="@{/admin/categories(page=${i})}" th:text="${i + 1}">1</a>
+                        </li>
+                        <li class="page-item" th:classappend="${categories.last} ? 'disabled'">
+                            <a class="page-link" th:href="@{/admin/categories(page=${categories.number + 1})}">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/js/main.js}"></script>
+
+
+</body>
+
+</html>
