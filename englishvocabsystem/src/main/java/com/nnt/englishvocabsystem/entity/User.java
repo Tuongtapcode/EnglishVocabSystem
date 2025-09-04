@@ -1,8 +1,10 @@
 package com.nnt.englishvocabsystem.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
 
@@ -11,6 +13,7 @@ import java.time.Instant;
 public class User {
     @Id
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Size(max = 100)
@@ -66,6 +69,10 @@ public class User {
 
     @Column(name = "last_login_at")
     private Instant lastLoginAt;
+
+    @Transient
+    @JsonIgnore
+    private MultipartFile fileAvatar;
 
     public Integer getId() {
         return id;
@@ -179,4 +186,12 @@ public class User {
         this.lastLoginAt = lastLoginAt;
     }
 
+
+    public MultipartFile getFileAvatar() {
+        return fileAvatar;
+    }
+
+    public void setFileAvatar(MultipartFile fileAvatar) {
+        this.fileAvatar = fileAvatar;
+    }
 }

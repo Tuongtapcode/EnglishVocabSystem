@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - English Learning App</title>
+    <th:context th:replace="~{base :: resources}">
+
+
+    </th:context>
+    <style>
+        .card {
+            border: none;
+            border-radius: 1rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 1rem 1rem 0 0;
+            padding: 1.5rem;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .form-section:last-of-type {
+            border-bottom: none;
+            margin-bottom: 1rem;
+        }
+
+        .form-section h5 {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .form-control,
+        .form-select {
+            border: 2px solid #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+            outline: none;
+        }
+
+        .form-control.is-invalid,
+        .form-select.is-invalid {
+            border-color: var(--danger-color);
+            box-shadow: 0 0 0 0.2rem rgba(239, 68, 68, 0.25);
+        }
+
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .readonly-field {
+            background-color: #f8f9fa;
+            opacity: 0.8;
+        }
+
+        .btn-outline-secondary:hover,
+        .btn-outline-danger:hover {
+            transform: translateY(-2px);
+        }
+
+        .text-danger {
+            font-size: 0.875rem;
+        }
+
+        .preview-section {
+            background: #f8fafc;
+            border: 2px dashed #d1d5db;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .avatar-preview {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid var(--primary-color);
+        }
+
+        .password-toggle {
+            position: relative;
+        }
+
+        .password-toggle .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #6c757d;
+        }
+
+        .user-stats {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .user-stats .stat-item {
+            text-align: center;
+        }
+
+        .user-stats .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: block;
+        }
+
+        .user-stats .stat-label {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div th:replace="~{base :: sidebar}"></div>
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div th:replace="~{base :: top-bar}"></div>
+
+        <div class="content-area">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card shadow">
+                        <div class="card-header text-center">
+                            <h3 class="mb-0">
+                                <i class="fas fa-user me-2"></i>
+                                Quản lý người dùng
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <form th:action="@{/users}" method="post" enctype="multipart/form-data" th:object="${user}">
+                                <input type="hidden" th:field="*{id}" />
+
+                                <!-- Thống kê người dùng (chỉ hiển thị khi edit) -->
+                                <div class="user-stats" th:if="${user.id != null}">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="stat-item">
+                                                <span class="stat-number">15</span>
+                                                <span class="stat-label">Từ đã học</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="stat-item">
+                                                <span class="stat-number">3</span>
+                                                <span class="stat-label">Streak days</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="stat-item">
+                                                <span class="stat-number"
+                                                    th:text="${#temporals.format(user.lastLoginAt, 'dd/MM/yyyy')}">01/01/2024</span>
+                                                <span class="stat-label">Lần cuối truy cập</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Thông tin cá nhân -->
+                                <div class="form-section">
+                                    <h5 class="text-primary mb-3">
+                                        <i class="fas fa-user-circle me-2"></i>
+                                        Thông tin cá nhân
+                                    </h5>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="firstName" class="form-label">Họ<span
+                                                        class="text-danger">*</span></label>
+                                                <input th:field="*{firstName}" type="text" class="form-control"
+                                                    id="firstName" name="firstName" required maxlength="100"
+                                                    placeholder="Nhập họ...">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="lastName" class="form-label">Tên<span
+                                                        class="text-danger">*</span></label>
+                                                <input th:field="*{lastName}" type="text" class="form-control"
+                                                    id="lastName" name="lastName" required maxlength="100"
+                                                    placeholder="Nhập tên...">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="email" class="form-label">Email<span
+                                                        class="text-danger">*</span></label>
+                                                <input th:field="*{email}" type="email" class="form-control" id="email"
+                                                    name="email" required maxlength="100"
+                                                    placeholder="example@email.com">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="phone" class="form-label">Số điện thoại<span
+                                                        class="text-danger">*</span></label>
+                                                <input th:field="*{phone}" type="tel" class="form-control" id="phone"
+                                                    name="phone" required maxlength="100" placeholder="0123456789">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Thông tin tài khoản -->
+                                <div class="form-section">
+                                    <h5 class="text-primary mb-3">
+                                        <i class="fas fa-key me-2"></i>
+                                        Thông tin tài khoản
+                                    </h5>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="username" class="form-label">Tên đăng nhập<span
+                                                        class="text-danger">*</span></label>
+                                                <input th:field="*{username}" type="text" class="form-control"
+                                                    id="username" name="username" required maxlength="100"
+                                                    placeholder="Nhập tên đăng nhập...">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3 password-toggle">
+                                                <label for="password" class="form-label">
+                                                    <span th:if="${user.id == null}">Mật khẩu<span
+                                                            class="text-danger">*</span></span>
+                                                    <span th:if="${user.id != null}">Mật khẩu mới (để trống nếu không
+                                                        đổi)</span>
+                                                </label>
+                                                <input th:field="*{password}" type="password" class="form-control"
+                                                    id="password" name="password" maxlength="100"
+                                                    placeholder="Nhập mật khẩu...">
+                                                <i class="fas fa-eye toggle-password"
+                                                    onclick="togglePassword('password')"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="userRole" class="form-label">Vai trò<span
+                                                        class="text-danger">*</span></label>
+                                                <select th:field="*{userRole}" class="form-select" id="userRole"
+                                                    name="userRole" required>
+                                                    <option value="">Chọn vai trò...</option>
+                                                    <option value="ROLE_ADMIN">Quản trị viên</option>
+                                                    <option value="ROLE_USER">Học viên</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="userType" class="form-label">Loại tài khoản</label>
+                                                <select th:field="*{userType}" class="form-select" id="userType"
+                                                    name="userType">
+                                                    <option value="">Chọn loại tài khoản...</option>
+                                                    <option value="FREE">Miễn phí</option>
+                                                    <option value="PREMIUM">Premium</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Ảnh đại diện -->
+                                <div class="form-section">
+                                    <h5 class="text-primary mb-3">
+                                        <i class="fas fa-image me-2"></i>
+                                        Ảnh đại diện
+                                    </h5>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="avatar" class="form-label">URL ảnh đại diện</label>
+                                                <input th:field="*{avatar}" type="url" class="form-control" id="avatar"
+                                                    maxlength="100" placeholder="https://example.com/avatar.jpg">
+                                            </div>
+
+                                            <!-- Preview khi có avatar URL -->
+                                            <div class="preview-section mt-2" th:if="${user.avatar != null}">
+                                                <img th:src="${user.avatar}" alt="Ảnh đại diện hiện tại"
+                                                    class="avatar-preview">
+                                                <p class="mt-2 mb-0">Ảnh đại diện hiện tại</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="fileAvatar" class="form-label">Hoặc tải lên ảnh mới</label>
+                                                <input th:field="*{fileAvatar}" type="file" class="form-control"
+                                                    id="fileAvatar" accept="image/*">
+                                                <small class="text-muted">Định dạng: JPG, PNG, GIF (tối đa 5MB)</small>
+                                            </div>
+
+                                            <!-- Preview ảnh vừa chọn -->
+                                            <div class="preview-section" id="avatarPreview" style="display: none;">
+                                                <img id="previewAvatar" src="" alt="Preview" class="avatar-preview">
+                                                <p class="mt-2 mb-0">Ảnh đại diện mới</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Trạng thái -->
+                                <div class="form-section">
+                                    <h5 class="text-primary mb-3">
+                                        <i class="fas fa-cogs me-2"></i>
+                                        Trạng thái tài khoản
+                                    </h5>
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="mb-3">
+                                                <div class="form-check form-switch">
+                                                    <input th:field="*{active}" class="form-check-input" type="checkbox"
+                                                        id="active" name="active" checked>
+                                                    <label class="form-check-label" for="active">
+                                                        <span id="status-text">Tài khoản đang hoạt động</span>
+                                                    </label>
+                                                </div>
+                                                <small class="text-muted">Tài khoản không hoạt động sẽ không thể đăng
+                                                    nhập</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Thời gian -->
+                                <div class="form-section">
+                                    <h5 class="text-primary mb-3">
+                                        <i class="fas fa-clock me-2"></i>
+                                        Thông tin thời gian
+                                    </h5>
+
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="created_at" class="form-label">Ngày tạo</label>
+                                                <input type="datetime-local" class="form-control readonly-field"
+                                                    id="created_at" name="created_at" readonly disabled
+                                                    th:value="${#temporals.format(user.createdAt, 'yyyy-MM-dd''T''HH:mm')}" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="updated_at" class="form-label">Cập nhật lần cuối</label>
+                                                <input type="datetime-local" class="form-control readonly-field"
+                                                    id="updated_at" name="updated_at" readonly disabled
+                                                    th:value="${#temporals.format(user.updatedAt, 'yyyy-MM-dd''T''HH:mm')}" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="last_login_at" class="form-label">Đăng nhập cuối</label>
+                                                <input type="datetime-local" class="form-control readonly-field"
+                                                    id="last_login_at" name="last_login_at" readonly disabled
+                                                    th:value="${#temporals.format(user.lastLoginAt, 'yyyy-MM-dd''T''HH:mm')}" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Nút hành động -->
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-primary btn-lg me-2">
+                                        <span th:if="${user.id == null}">
+                                            <i class="fas fa-user-plus me-2"></i>
+                                            Thêm người dùng</span>
+                                        <span th:if="${user.id != null}">
+                                            <i class="fas fa-save me-2"></i>
+                                            Cập nhật người dùng</span>
+                                    </button>
+
+                                    <button type="button" class="btn btn-outline-info btn-lg me-2"
+                                        onclick="togglePreview()">
+                                        <i class="fas fa-eye me-2"></i>
+                                        Xem thông tin
+                                    </button>
+
+                                    <a href="/admin/users" class="btn btn-outline-secondary btn-lg me-2">
+                                        <i class="fas fa-arrow-left me-2"></i>
+                                        Quay lại
+                                    </a>
+
+                                    <button type="reset" class="btn btn-outline-danger btn-lg">
+                                        <i class="fas fa-undo me-2"></i>
+                                        Đặt lại
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="previewModalLabel">
+                        <i class="fas fa-eye me-2"></i>Xem trước thông tin người dùng
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <img id="previewUserAvatar" src="" alt="Avatar" class="avatar-preview mb-3"
+                            style="display: none;">
+                        <h4 id="previewUserName"></h4>
+                        <p class="text-muted" id="previewUserRole"></p>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Username:</strong> <span id="previewUsername"></span><br>
+                            <strong>Email:</strong> <span id="previewEmail"></span><br>
+                            <strong>Điện thoại:</strong> <span id="previewPhone"></span><br>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Loại tài khoản:</strong> <span id="previewUserType"></span><br>
+                            <strong>Trạng thái:</strong> <span id="previewStatus"></span><br>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/main.js}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Preview avatar file
+        document.getElementById("fileAvatar").addEventListener("change", function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (ev) {
+                    document.getElementById("previewAvatar").src = ev.target.result;
+                    document.getElementById("avatarPreview").style.display = "block";
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Toggle password visibility
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const toggle = field.nextElementSibling;
+
+            if (field.type === "password") {
+                field.type = "text";
+                toggle.classList.remove("fa-eye");
+                toggle.classList.add("fa-eye-slash");
+            } else {
+                field.type = "password";
+                toggle.classList.remove("fa-eye-slash");
+                toggle.classList.add("fa-eye");
+            }
+        }
+
+        // Update status text
+        document.getElementById("active").addEventListener("change", function () {
+            const statusText = document.getElementById("status-text");
+            if (this.checked) {
+                statusText.textContent = "Tài khoản đang hoạt động";
+                statusText.className = "text-success";
+            } else {
+                statusText.textContent = "Tài khoản bị khóa";
+                statusText.className = "text-danger";
+            }
+        });
+
+        // Preview function
+        function togglePreview() {
+            // Get form values
+            const firstName = document.getElementById("firstName").value;
+            const lastName = document.getElementById("lastName").value;
+            const username = document.getElementById("username").value;
+            const email = document.getElementById("email").value;
+            const phone = document.getElementById("phone").value;
+            const userRole = document.getElementById("userRole").value;
+            const userType = document.getElementById("userType").value;
+            const active = document.getElementById("active").checked;
+            const avatar = document.getElementById("avatar").value;
+
+            // Set preview values
+            document.getElementById("previewUserName").textContent = `${firstName} ${lastName}`;
+            document.getElementById("previewUsername").textContent = username || "Chưa nhập";
+            document.getElementById("previewEmail").textContent = email || "Chưa nhập";
+            document.getElementById("previewPhone").textContent = phone || "Chưa nhập";
+            document.getElementById("previewUserRole").textContent = getUserRoleText(userRole);
+            document.getElementById("previewUserType").textContent = getUserTypeText(userType);
+            document.getElementById("previewStatus").textContent = active ? "Hoạt động" : "Bị khóa";
+            document.getElementById("previewStatus").className = active ? "text-success" : "text-danger";
+
+            // Set avatar
+            if (avatar) {
+                document.getElementById("previewUserAvatar").src = avatar;
+                document.getElementById("previewUserAvatar").style.display = "block";
+            } else {
+                document.getElementById("previewUserAvatar").style.display = "none";
+            }
+
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('previewModal'));
+            modal.show();
+        }
+
+        function getUserRoleText(role) {
+            switch (role) {
+                case 'ADMIN': return 'Quản trị viên';
+                case 'TEACHER': return 'Giáo viên';
+                case 'STUDENT': return 'Học viên';
+                case 'MODERATOR': return 'Kiểm duyệt viên';
+                default: return 'Chưa chọn';
+            }
+        }
+
+        function getUserTypeText(type) {
+            switch (type) {
+                case 'FREE': return 'Miễn phí';
+                case 'PREMIUM': return 'Premium';
+                case 'VIP': return 'VIP';
+                default: return 'Chưa chọn';
+            }
+        }
+
+        // Form validation
+        document.querySelector('form').addEventListener('submit', function (e) {
+            const password = document.getElementById('password');
+            const userId = document.querySelector('input[name="id"]').value;
+
+            // If creating new user, password is required
+            if (!userId && !password.value.trim()) {
+                e.preventDefault();
+                alert('Mật khẩu là bắt buộc khi tạo người dùng mới!');
+                password.focus();
+                return false;
+            }
+        });
+    </script>
+
+</body>
+
+</html>

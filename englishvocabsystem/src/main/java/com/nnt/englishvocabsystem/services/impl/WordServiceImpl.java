@@ -1,12 +1,17 @@
 package com.nnt.englishvocabsystem.services.impl;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.nnt.englishvocabsystem.dto.CategoryDTO;
 import com.nnt.englishvocabsystem.dto.WordDTO;
 import com.nnt.englishvocabsystem.entity.VocabularyList;
 import com.nnt.englishvocabsystem.entity.Word;
 import com.nnt.englishvocabsystem.repositories.WordRepository;
 import com.nnt.englishvocabsystem.services.WordService;
+import com.nnt.englishvocabsystem.utils.RequestParamUtils;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Predicate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,11 +19,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 @Service
@@ -28,14 +35,23 @@ public class WordServiceImpl implements WordService {
     public WordServiceImpl(WordRepository wordRepository) {
         this.wordRepository = wordRepository;
     }
+
+    @Autowired
+    private Cloudinary cloudinary;
+    @Override
+    public Word getWordById(Integer id) {
+        return wordRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Word not found with id = " + id));
+    }
+
     @Override
     public List<Word> getWordsByCategoryId(Integer categoryId) {
         return wordRepository.findByCategoryId(categoryId);
     }
     @Override
     public Page<WordDTO> getAllWords(Map<String, String> params) {
-        int page = parseIntSafe(params.get("page"), 0);
-        int size = parseIntSafe(params.get("size"), 10);
+        int page = RequestParamUtils.parseIntSafe(params.get("page"), 0);
+        int size = RequestParamUtils.parseIntSafe(params.get("size"), 10);
         String sortBy = params.getOrDefault("sortBy", "id");
         String direction = params.getOrDefault("direction", "asc");
 
@@ -51,7 +67,7 @@ public class WordServiceImpl implements WordService {
 
             // Search theo keyword
             String keyword = params.get("keyword");
-            if (hasText(keyword)) {
+            if (RequestParamUtils.hasText(keyword)) {
                 String kwLower = "%" + keyword.toLowerCase() + "%";
                 predicates.add(cb.or(
                         cb.like(cb.lower(root.get("englishWord").as(String.class)), kwLower),
@@ -61,7 +77,7 @@ public class WordServiceImpl implements WordService {
 
             // Filter theo level
             String level = params.get("level");
-            if (hasText(level)) {
+            if (RequestParamUtils.hasText(level)) {
                 predicates.add(
                         cb.equal(cb.lower(root.get("level").as(String.class)), level.toLowerCase())
                 );
@@ -70,7 +86,7 @@ public class WordServiceImpl implements WordService {
 
             // Filter theo wordType
             String wordType = params.get("wordType");
-            if (hasText(wordType)) {
+            if (RequestParamUtils.hasText(wordType)) {
                 predicates.add(
                         cb.equal(cb.lower(root.get("wordType").as(String.class)), wordType.toLowerCase())
                 );
@@ -78,8 +94,8 @@ public class WordServiceImpl implements WordService {
 
             // Filter theo category
             String category = params.get("category");
-            if (hasText(category)) {
-                Integer catId = parseIntSafe(category, null);
+            if (RequestParamUtils.hasText(category)) {
+                Integer catId = RequestParamUtils.parseIntSafe(category, null);
                 if (catId != null) {
                     predicates.add(cb.equal(root.get("category").get("id"), catId));
                 }
@@ -109,18 +125,52 @@ public class WordServiceImpl implements WordService {
         ));
     }
 
-    // Hàm parse int an toàn
-    private Integer parseIntSafe(String value, Integer defaultValue) {
+
+    @Override
+    public void addOrUpdateWord(Word word) {
         try {
-            return (value != null && !value.isEmpty()) ? Integer.parseInt(value) : defaultValue;
-        } catch (NumberFormatException e) {
-            return defaultValue;
+            Word existing = null;
+            if (word.getId() != null) {
+                existing = wordRepository.findById(word.getId()).orElse(null);
+            }
+            if (existing != null) {
+                word.setCreatedAt(existing.getCreatedAt());
+            } else {
+                word.setCreatedAt(Instant.now());
+            }
+            word.setUpdatedAt(Instant.now());
+
+            if (word.getAudioFile() != null && !word.getAudioFile().isEmpty()) {
+                Map<?, ?> res = cloudinary.uploader().upload(
+                        word.getAudioFile().getBytes(),
+                        ObjectUtils.asMap("resource_type", "auto")
+                );
+                word.setAudioUrl(res.get("secure_url").toString());
+            }
+
+            // Upload image file nếu có
+            if (word.getImageFile() != null && !word.getImageFile().isEmpty()) {
+                Map<?, ?> res = cloudinary.uploader().upload(
+                        word.getImageFile().getBytes(),
+                        ObjectUtils.asMap("resource_type", "auto")
+                );
+                word.setImageUrl(res.get("secure_url").toString());
+            }
+
+            // Lưu xuống DB
+            wordRepository.save(word);
+
+        } catch (IOException e) {
+            Logger.getLogger(WordServiceImpl.class.getName()).log(Level.SEVERE, null, e);
+            throw new RuntimeException("Upload file thất bại!", e);
         }
     }
 
-    // Check chuỗi có ký tự không
-    private boolean hasText(String str) {
-        return str != null && !str.trim().isEmpty();
+    @Override
+    public void deleteWordById(Integer id) {
+        if (!wordRepository.existsById(id)) {
+            throw new EntityNotFoundException("Word with id " + id + " not found!");
+        }
+        wordRepository.deleteById(id);
     }
-
 }

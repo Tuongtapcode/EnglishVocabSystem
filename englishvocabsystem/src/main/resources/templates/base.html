@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - English Learning App</title>
+    <th:context th:fragment="resources">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+        <link rel="stylesheet" th:href="@{/css/styles.css}">
+    </th:context>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <nav th:fragment="sidebar" class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="#" class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                <span class="logo-text">VocabAdmin</span>
+            </a>
+        </div>
+        <ul class="nav flex-column mt-3">
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/dashboard}" data-page="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/users}" data-page="users">
+                    <i class="fas fa-users"></i>
+                    <span class="nav-text">Người dùng</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/words}" data-page="words">
+                    <i class="fas fa-book"></i>
+                    <span class="nav-text">Từ vựng</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/categories}" data-page="categories">
+                    <i class="fas fa-tags"></i>
+                    <span class="nav-text">Danh mục</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/questions}" data-page="questions">
+                    <i class="fas fa-question-circle"></i>
+                    <span class="nav-text">Câu hỏi</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-page="vocabulary-lists">
+                    <i class="fas fa-list-ul"></i>
+                    <span class="nav-text">Danh sách từ</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-page="notifications">
+                    <i class="fas fa-bell position-relative"></i>
+                    <span class="nav-text">Thông báo</span>
+                    <span class="notification-badge">3</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-page="analytics">
+                    <i class="fas fa-chart-line"></i>
+                    <span class="nav-text">Phân tích</span>
+                </a>
+            </li>
+            <li class="nav-item mt-auto">
+                <a class="nav-link" href="#" data-page="settings">
+                    <i class="fas fa-cog"></i>
+                    <span class="nav-text">Cài đặt</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Top Bar -->
+    <div th:fragment="top-bar" class="top-bar">
+        <div class="d-flex align-items-center">
+            <button class="toggle-btn" id="toggleSidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h4 class="mb-0 ms-3 fw-bold text-dark" id="pageTitle">Dashboard</h4>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <div class="position-relative">
+                <i class="fas fa-bell text-muted fs-5"></i>
+                <span class="notification-badge">5</span>
+            </div>
+            <div class="dropdown">
+                <a href="#" class="d-flex align-items-center text-decoration-none" data-bs-toggle="dropdown">
+                    <img src="https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png" alt="Admin"
+                        class="user-avatar me-2">
+                    <span class="text-dark fw-semibold">Admin</span>
+                    <i class="fas fa-chevron-down ms-2 text-muted"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
+                    <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Cài đặt</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-sign-out-alt me-2"></i>Đăng
+                            xuất</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

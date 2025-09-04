@@ -1,9 +1,12 @@
 package com.nnt.englishvocabsystem.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nnt.englishvocabsystem.enums.Level;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
 
@@ -12,6 +15,7 @@ import java.time.Instant;
 public class Word {
     @Id
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Size(max = 100)
@@ -40,6 +44,7 @@ public class Word {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "category_id", nullable = false)
+    @JsonBackReference
     private Category category;
 
     @Lob
@@ -69,11 +74,21 @@ public class Word {
     @Column(name = "approval_status", length = 20)
     private String approvalStatus;
 
+
     @Column(name = "created_at")
     private Instant createdAt;
 
     @Column(name = "updated_at")
     private Instant updatedAt;
+
+    @Transient
+    @JsonIgnore
+    private MultipartFile audioFile;
+
+
+    @Transient
+    @JsonIgnore
+    private MultipartFile imageFile;
 
     public Integer getId() {
         return id;
@@ -203,4 +218,40 @@ public class Word {
         this.updatedAt = updatedAt;
     }
 
+
+    public Boolean getActive() {
+        return isActive;
+    }
+
+    public void setActive(Boolean active) {
+        isActive = active;
+    }
+
+    public MultipartFile getAudioFile() {
+        return audioFile;
+    }
+
+    public void setAudioFile(MultipartFile audioFile) {
+        this.audioFile = audioFile;
+    }
+
+    public MultipartFile getImageFile() {
+        return imageFile;
+    }
+
+    public void setImageFile(MultipartFile imageFile) {
+        this.imageFile = imageFile;
+    }
+
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = Instant.now();
+    }
 }

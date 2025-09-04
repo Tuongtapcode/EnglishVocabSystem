@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - English Learning App</title>
+    <th:context th:replace="~{base :: resources}">
+
+    </th:context>
+    <style>
+        .word-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 2px solid #e9ecef;
+        }
+
+        .no-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div th:replace="~{base :: sidebar}"></div>
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div th:replace="~{base :: top-bar}"></div>
+
+        <div class="content-area">
+            <!-- Words Management Content -->
+            <div id="words-content" class="page-content fade-in">
+                <h1 class="page-title">Quản lý từ vựng</h1>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="d-flex gap-3">
+
+                        <a class="btn btn-primary" th:href="@{/words/add}">
+                            <i class="fas fa-plus me-2"></i>Thêm từ vựng
+                        </a>
+                        <button class="btn btn-success">
+                            <i class="fas fa-upload me-2"></i>Import Excel
+                        </button>
+                    </div>
+                    <form th:action="@{/words}" method="get" class="input-group" style="width: 300px;">
+                        <input type="text" name="keyword" class="form-control" placeholder="Tìm kiếm từ vựng..."
+                            th:value="${keyword}">
+                        <button class="btn btn-secondary" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h5 class="mb-0">Danh sách từ vựng</h5>
+                        <small class="text-muted">Tổng cộng: <span th:text="${words.totalElements}">25</span> từ
+                            vựng</small>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Hình ảnh</th>
+                                    <th>Từ tiếng Anh</th>
+                                    <th>Nghĩa tiếng Việt</th>
+                                    <th>Loại từ</th>
+                                    <th>Cấp độ</th>
+                                    <th>Danh mục</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="word:${words.content}">
+                                    <td th:text="${word.id}">1</td>
+                                    <td>
+                                        <div th:if="${word.imageUrl}">
+                                            <img th:src="${word.imageUrl}" class="word-image"
+                                                th:alt="${word.englishWord}" />
+                                        </div>
+                                        <div th:unless="${word.imageUrl}" class="no-image">
+                                            <i class="fas fa-image"></i>
+                                        </div>
+                                    </td>
+                                    <td class="fw-semibold" th:text="${word.englishWord}">hello</td>
+                                    <td th:text="${word.vietnameseMeaning}">xin chào</td>
+                                    <td><span class="badge bg-info" th:text="${word.wordType}">interjection</span></td>
+                                    <td><span class="badge bg-success" th:text="${word.level}">A1</span></td>
+                                    <td><span class="badge bg-primary" th:text="${word.category.name}">Greetings</span>
+                                    </td>
+                                    <td><span class="badge bg-success">Approved</span></td>
+                                    <td>
+
+                                        <a class="btn btn-action btn-edit" th:href="@{'/words/' + ${word.id}}">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button th:onclick="'deleteWord(\'' + @{/api/words/} + ${word.id} + '\')'"
+                                            class="btn-action btn-delete" title="Xóa">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <!-- Add more word rows here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <nav aria-label="Word pagination" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <!-- Previous -->
+                    <li class="page-item" th:classappend="${words.first} ? 'disabled'">
+                        <a class="page-link" th:href="@{/words(page=${words.number - 1})}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+
+                    <!-- Page numbers -->
+                    <li class="page-item" th:each="i : ${#numbers.sequence(0, words.totalPages - 1)}"
+                        th:classappend="${i == words.number} ? 'active'">
+                        <a class="page-link" th:href="@{/words(page=${i})}" th:text="${i + 1}">1</a>
+                    </li>
+
+                    <!-- Next -->
+                    <li class="page-item" th:classappend="${words.last} ? 'disabled'">
+                        <a class="page-link" th:href="@{/words(page=${words.number + 1})}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+    <script th:src="@{/js/main.js}"></script>
+    <script>
+        function deleteWord(endpoint) {
+            if (confirm("Bạn có chắc chắn muốn xóa từ này?")) {
+                // API call to delete word
+                fetch(endpoint, {
+                    method: "DELETE",
+                }).then((response) => {
+                    if (response.status === 204) {
+                        alert("Đã xóa từ thành công!");
+                        location.reload();
+                    } else {
+                        alert("Xóa từ thất bại!");
+                    }
+                });
+            }
+        }
+    </script>
+
+
+</body>
+
+</html>

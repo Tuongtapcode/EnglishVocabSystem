@@ -10,6 +10,7 @@ import java.time.Instant;
 public class UserStreak {
     @Id
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @NotNull
@@ -141,6 +142,16 @@ public class UserStreak {
 
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    @PrePersist
+    public void onCreate() {
+        updatedAt = Instant.now();
+    }
+
+    @PreUpdate
+    public void onUpdate() {
+        updatedAt = Instant.now();
     }
 
 }

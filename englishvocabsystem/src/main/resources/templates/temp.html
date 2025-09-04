@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - English Learning App</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --secondary-color: #8b5cf6;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #3b82f6;
+            --dark-color: #1f2937;
+            --light-color: #f8fafc;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(180deg, #1a202c 0%, #2d3748 100%);
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .sidebar.collapsed {
+            width: 70px;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #4a5568;
+            text-align: center;
+        }
+
+        .sidebar.collapsed .sidebar-header {
+            padding: 1rem 0.5rem;
+        }
+
+        .logo {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar.collapsed .logo-text {
+            display: none;
+        }
+
+        .nav-item {
+            margin: 0.5rem 0;
+        }
+
+        .nav-link {
+            color: #cbd5e0;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            margin: 0 1rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            position: relative;
+        }
+
+        .sidebar.collapsed .nav-link {
+            margin: 0.25rem;
+            justify-content: center;
+            padding: 1rem 0.5rem;
+        }
+
+        .sidebar.collapsed .nav-text {
+            display: none;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .sidebar.collapsed .nav-link:hover {
+            transform: none;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        .main-content.expanded {
+            margin-left: 70px;
+        }
+
+        .top-bar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .toggle-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--dark-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn:hover {
+            color: var(--primary-color);
+            transform: scale(1.1);
+        }
+
+        .content-area {
+            padding: 2rem;
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: none;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .stats-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-label {
+            color: #64748b;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-top: 2rem;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1.5rem 2rem;
+            font-weight: 600;
+        }
+
+        .table th {
+            border: none;
+            padding: 1rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            background: #f8fafc;
+        }
+
+        .table td {
+            border: none;
+            padding: 1rem;
+            vertical-align: middle;
+        }
+
+        .btn-action {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 0.25rem;
+        }
+
+        .btn-edit {
+            background: var(--info-color);
+            color: white;
+        }
+
+        .btn-delete {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-action:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        .page-title {
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.6s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="#" class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                <span class="logo-text">VocabAdmin</span>
+            </a>
+        </div>
+        <ul class="nav flex-column mt-3">
+            <li class="nav-item">
+                <a class="nav-link active" href="#" data-page="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-page="users">
+                    <i class="fas fa-users"></i>
+                    <span class="nav-text">Người dùng</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-page="words">
+                    <i class="fas fa-book"></i>
+                    <span class="nav-text">Từ vựng</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-page="categories">
+                    <i class="fas fa-tags"></i>
+                    <span class="nav-text">Danh mục</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-page="exercises">
+                    <i class="fas fa-dumbbell"></i>
+                    <span class="nav-text">Bài tập</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-page="vocabulary-lists">
+                    <i class="fas fa-list-ul"></i>
+                    <span class="nav-text">Danh sách từ</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-page="notifications">
+                    <i class="fas fa-bell position-relative"></i>
+                    <span class="nav-text">Thông báo</span>
+                    <span class="notification-badge">3</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-page="analytics">
+                    <i class="fas fa-chart-line"></i>
+                    <span class="nav-text">Phân tích</span>
+                </a>
+            </li>
+            <li class="nav-item mt-auto">
+                <a class="nav-link" href="#" data-page="settings">
+                    <i class="fas fa-cog"></i>
+                    <span class="nav-text">Cài đặt</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="d-flex align-items-center">
+                <button class="toggle-btn" id="toggleSidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h4 class="mb-0 ms-3 fw-bold text-dark" id="pageTitle">Dashboard</h4>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <div class="position-relative">
+                    <i class="fas fa-bell text-muted fs-5"></i>
+                    <span class="notification-badge">5</span>
+                </div>
+                <div class="dropdown">
+                    <a href="#" class="d-flex align-items-center text-decoration-none" data-bs-toggle="dropdown">
+                        <img src="https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png" alt="Admin"
+                            class="user-avatar me-2">
+                        <span class="text-dark fw-semibold">Admin</span>
+                        <i class="fas fa-chevron-down ms-2 text-muted"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Cài đặt</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-sign-out-alt me-2"></i>Đăng
+                                xuất</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Dashboard Content -->
+            <div id="dashboard-content" class="page-content fade-in">
+                <h1 class="page-title">Dashboard Overview</h1>
+
+                <!-- Stats Cards -->
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-3 col-md-6">
+                        <div class="stats-card">
+                            <div class="stats-icon" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stats-number">1,247</div>
+                            <div class="stats-label">Người dùng</div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="stats-card">
+                            <div class="stats-icon" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div class="stats-number">3,856</div>
+                            <div class="stats-label">Từ vựng</div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="stats-card">
+                            <div class="stats-icon" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">
+                                <i class="fas fa-dumbbell"></i>
+                            </div>
+                            <div class="stats-number">892</div>
+                            <div class="stats-label">Bài tập</div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="stats-card">
+                            <div class="stats-icon" style="background: linear-gradient(135deg, #43e97b, #38f9d7);">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="stats-number">15,647</div>
+                            <div class="stats-label">Phiên học</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="row g-4">
+                    <div class="col-lg-8">
+                        <div class="chart-container">
+                            <h5 class="mb-4 fw-bold">Hoạt động người dùng (7 ngày qua)</h5>
+                            <canvas id="userActivityChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="chart-container">
+                            <h5 class="mb-4 fw-bold">Phân loại người dùng</h5>
+                            <canvas id="userTypeChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activities -->
+                <div class="table-container mt-4">
+                    <div class="table-header">
+                        <h5 class="mb-0">Phie động gần đây</h5>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Người dùng</th>
+                                    <th>Hoạt động</th>
+                                    <th>Thời gian</th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"
+                                                alt="User" class="user-avatar me-3">
+                                            <div>
+                                                <div class="fw-semibold">Nguyễn Văn A</div>
+                                                <div class="text-muted small">user@example.com</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Hoàn thành bài tập Grammar Basics</td>
+                                    <td>5 phút trước</td>
+                                    <td><span class="badge bg-success">Thành công</span></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"
+                                                alt="User" class="user-avatar me-3">
+                                            <div>
+                                                <div class="fw-semibold">Trần Thị B</div>
+                                                <div class="text-muted small">user2@example.com</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Thêm từ vựng mới vào danh sách</td>
+                                    <td>12 phút trước</td>
+                                    <td><span class="badge bg-info">Hoạt động</span></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"
+                                                alt="User" class="user-avatar me-3">
+                                            <div>
+                                                <div class="fw-semibold">Lê Văn C</div>
+                                                <div class="text-muted small">user3@example.com</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Đăng ký tài khoản Premium</td>
+                                    <td>1 giờ trước</td>
+                                    <td><span class="badge bg-warning">Chờ xử lý</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Other page contents will be loaded here dynamically -->
+            <div id="users-content" class="page-content hidden fade-in">
+                <h1 class="page-title">Quản lý người dùng</h1>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="d-flex gap-3">
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                            <i class="fas fa-plus me-2"></i>Thêm người dùng
+                        </button>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button"
+                                data-bs-toggle="dropdown">
+                                <i class="fas fa-filter me-2"></i>Lọc
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">Tất cả</a></li>
+                                <li><a class="dropdown-item" href="#">Premium</a></li>
+                                <li><a class="dropdown-item" href="#">Free</a></li>
+                                <li><a class="dropdown-item" href="#">Admin</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="input-group" style="width: 300px;">
+                        <input type="text" class="form-control" placeholder="Tìm kiếm người dùng...">
+                        <button class="btn btn-outline-secondary" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h5 class="mb-0">Danh sách người dùng</h5>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Người dùng</th>
+                                    <th>Email</th>
+                                    <th>Loại tài khoản</th>
+                                    <th>Ngày tạo</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"
+                                                alt="User" class="user-avatar me-3">
+                                            <div>
+                                                <div class="fw-semibold">Nguyễn Văn A</div>
+                                                <div class="text-muted small">@nguyenvana</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>user@example.com</td>
+                                    <td><span class="badge bg-success">Premium</span></td>
+                                    <td>15/01/2024</td>
+                                    <td><span class="badge bg-success">Hoạt động</span></td>
+                                    <td>
+                                        <button class="btn-action btn-edit" title="Chỉnh sửa">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn-action btn-delete" title="Xóa">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <!-- Add more user rows here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Words Management Content -->
+            <div id="words-content" class="page-content hidden fade-in">
+                <h1 class="page-title">Quản lý từ vựng</h1>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="d-flex gap-3">
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addWordModal">
+                            <i class="fas fa-plus me-2"></i>Thêm từ vựng
+                        </button>
+                        <button class="btn btn-success">
+                            <i class="fas fa-upload me-2"></i>Import Excel
+                        </button>
+                    </div>
+                    <div class="input-group" style="width: 300px;">
+                        <input type="text" class="form-control" placeholder="Tìm kiếm từ vựng...">
+                        <button class="btn btn-outline-secondary" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h5 class="mb-0">Danh sách từ vựng</h5>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Từ tiếng Anh</th>
+                                    <th>Nghĩa tiếng Việt</th>
+                                    <th>Loại từ</th>
+                                    <th>Cấp độ</th>
+                                    <th>Danh mục</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td class="fw-semibold">hello</td>
+                                    <td>xin chào</td>
+                                    <td><span class="badge bg-info">interjection</span></td>
+                                    <td><span class="badge bg-success">A1</span></td>
+                                    <td>Greetings</td>
+                                    <td><span class="badge bg-success">Approved</span></td>
+                                    <td>
+                                        <button class="btn-action btn-edit" title="Chỉnh sửa">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn-action btn-delete" title="Xóa">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <!-- Add more word rows here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div class="modal fade" id="addUserModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Thêm người dùng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addUserForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Họ</label>
+                                <input type="text" class="form-control" name="first_name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Tên</label>
+                                <input type="text" class="form-control" name="last_name" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-control" name="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Số điện thoại</label>
+                            <input type="tel" class="form-control" name="phone" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Vai trò</label>
+                                <select class="form-control" name="user_role">
+                                    <option value="user">User</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Loại tài khoản</label>
+                                <select class="form-control" name="user_type">
+                                    <option value="free">Free</option>
+                                    <option value="premium">Premium</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mật khẩu</label>
+                            <input type="password" class="form-control" name="password" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" onclick="saveUser()">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Word Modal -->
+    <div class="modal fade" id="addWordModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Thêm từ vựng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addWordForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Từ tiếng Anh</label>
+                                <input type="text" class="form-control" name="english_word" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Phiên âm</label>
+                                <input type="text" class="form-control" name="pronunciation" placeholder="/həˈloʊ/">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nghĩa tiếng Việt</label>
+                            <textarea class="form-control" name="vietnamese_meaning" rows="2" required></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Loại từ</label>
+                                <select class="form-control" name="word_type" required>
+                                    <option value="">Chọn loại từ</option>
+                                    <option value="noun">Danh từ</option>
+                                    <option value="verb">Động từ</option>
+                                    <option value="adjective">Tính từ</option>
+                                    <option value="adverb">Trạng từ</option>
+                                    <option value="preposition">Giới từ</option>
+                                    <option value="conjunction">Liên từ</option>
+                                    <option value="pronoun">Đại từ</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Cấp độ</label>
+                                <select class="form-control" name="level" required>
+                                    <option value="">Chọn cấp độ</option>
+                                    <option value="a1">A1</option>
+                                    <option value="a2">A2</option>
+                                    <option value="b1">B1</option>
+                                    <option value="b2">B2</option>
+                                    <option value="c1">C1</option>
+                                    <option value="c2">C2</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Danh mục</label>
+                                <select class="form-control" name="category_id" required>
+                                    <option value="">Chọn danh mục</option>
+                                    <option value="1">Greetings</option>
+                                    <option value="2">Family</option>
+                                    <option value="3">Food</option>
+                                    <option value="4">Travel</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Câu ví dụ tiếng Anh</label>
+                            <textarea class="form-control" name="example_sentence_en" rows="2"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Câu ví dụ tiếng Việt</label>
+                            <textarea class="form-control" name="example_sentence_vi" rows="2"></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Hình ảnh URL</label>
+                                <input type="url" class="form-control" name="image_url">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Audio URL</label>
+                                <input type="url" class="form-control" name="audio_url">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" onclick="saveWord()">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+
+    <script>
+        // Global variables
+        let currentPage = 'dashboard';
+        let sidebarCollapsed = false;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function () {
+            initializeCharts();
+            setupEventListeners();
+            loadPageData('dashboard');
+        });
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Sidebar toggle
+            document.getElementById('toggleSidebar').addEventListener('click', toggleSidebar);
+
+            // Navigation links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const page = this.getAttribute('data-page');
+                    navigateToPage(page);
+                });
+            });
+
+            // Mobile responsive
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.add('collapsed');
+                document.getElementById('mainContent').classList.add('expanded');
+                sidebarCollapsed = true;
+            }
+
+            window.addEventListener('resize', function () {
+                if (window.innerWidth <= 768) {
+                    if (!sidebarCollapsed) {
+                        toggleSidebar();
+                    }
+                }
+            });
+        }
+
+        // Toggle sidebar
+
+        // Navigate to page
+        function navigateToPage(page) {
+            // Update active nav link
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            document.querySelector(`[data-page="${page}"]`).classList.add('active');
+
+            // Hide all page contents
+            document.querySelectorAll('.page-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            // Show selected page content
+            const pageContent = document.getElementById(`${page}-content`);
+            if (pageContent) {
+                pageContent.classList.remove('hidden');
+                pageContent.classList.add('fade-in');
+            } else {
+                // Create placeholder for pages not implemented yet
+                showPlaceholderPage(page);
+            }
+
+            // Update page title
+            const pageTitles = {
+                'dashboard': 'Dashboard',
+                'users': 'Quản lý người dùng',
+                'words': 'Quản lý từ vựng',
+                'categories': 'Quản lý danh mục',
+                'exercises': 'Quản lý bài tập',
+                'vocabulary-lists': 'Danh sách từ vựng',
+                'notifications': 'Thông báo',
+                'analytics': 'Phân tích',
+                'settings': 'Cài đặt'
+            };
+
+            document.getElementById('pageTitle').textContent = pageTitles[page] || page;
+            currentPage = page;
+
+            // Load page specific data
+            loadPageData(page);
+        }
+
+        // Show placeholder for unimplemented pages
+        function showPlaceholderPage(page) {
+            const contentArea = document.querySelector('.content-area');
+            const existingPlaceholder = document.getElementById('placeholder-content');
+
+            if (existingPlaceholder) {
+                existingPlaceholder.remove();
+            }
+
+            const placeholder = document.createElement('div');
+            placeholder.id = 'placeholder-content';
+            placeholder.className = 'page-content fade-in text-center py-5';
+            placeholder.innerHTML = `
+                <div class="py-5">
+                    <i class="fas fa-construction fa-4x text-muted mb-4"></i>
+                    <h3 class="text-white mb-3">Trang đang phát triển</h3>
+                    <p class="text-white-50">Tính năng này sẽ sớm được cập nhật.</p>
+                    <button class="btn btn-primary mt-3" onclick="navigateToPage('dashboard')">
+                        <i class="fas fa-arrow-left me-2"></i>Quay về Dashboard
+                    </button>
+                </div>
+            `;
+
+            contentArea.appendChild(placeholder);
+        }
+
+        // Load page specific data
+        function loadPageData(page) {
+            switch (page) {
+                case 'dashboard':
+                    loadDashboardData();
+                    break;
+                case 'users':
+                    loadUsersData();
+                    break;
+                case 'words':
+                    loadWordsData();
+                    break;
+                // Add more cases for other pages
+            }
+        }
+
+        // Load dashboard data
+        function loadDashboardData() {
+            // In a real application, this would fetch data from an API
+            updateStatsCards({
+                users: 1247,
+                words: 3856,
+                exercises: 892,
+                sessions: 15647
+            });
+        }
+
+        // Update stats cards
+        function updateStatsCards(data) {
+            const cards = document.querySelectorAll('.stats-number');
+            cards[0].textContent = data.users.toLocaleString();
+            cards[1].textContent = data.words.toLocaleString();
+            cards[2].textContent = data.exercises.toLocaleString();
+            cards[3].textContent = data.sessions.toLocaleString();
+        }
+
+        // Load users data
+        function loadUsersData() {
+            // Show loading state
+            showLoading('users-content');
+
+            // Simulate API call
+            setTimeout(() => {
+                hideLoading('users-content');
+                // In a real app, populate table with actual data
+            }, 1000);
+        }
+
+        // Load words data
+        function loadWordsData() {
+            // Show loading state
+            showLoading('words-content');
+
+            // Simulate API call
+            setTimeout(() => {
+                hideLoading('words-content');
+                // In a real app, populate table with actual data
+            }, 1000);
+        }
+
+        // Show loading state
+        function showLoading(contentId) {
+            const content = document.getElementById(contentId);
+            if (content) {
+                const loading = document.createElement('div');
+                loading.className = 'loading';
+                loading.innerHTML = '<div class="spinner"></div>';
+                content.appendChild(loading);
+            }
+        }
+
+        // Hide loading state
+        function hideLoading(contentId) {
+            const content = document.getElementById(contentId);
+            if (content) {
+                const loading = content.querySelector('.loading');
+                if (loading) {
+                    loading.remove();
+                }
+            }
+        }
+
+        // Initialize charts
+        function initializeCharts() {
+            // User Activity Chart
+            const userActivityCtx = document.getElementById('userActivityChart').getContext('2d');
+            new Chart(userActivityCtx, {
+                type: 'line',
+                data: {
+                    labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
+                    datasets: [{
+                        label: 'Người dùng hoạt động',
+                        data: [120, 190, 300, 500, 200, 300, 450],
+                        borderColor: 'rgb(99, 102, 241)',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+
+            // User Type Chart
+            const userTypeCtx = document.getElementById('userTypeChart').getContext('2d');
+            new Chart(userTypeCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Free', 'Premium'],
+                    datasets: [{
+                        data: [847, 400],
+                        backgroundColor: [
+                            'rgba(99, 102, 241, 0.8)',
+                            'rgba(16, 185, 129, 0.8)'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Save user function
+        function saveUser() {
+            const form = document.getElementById('addUserForm');
+            const formData = new FormData(form);
+
+            // Show loading state
+            const saveBtn = event.target;
+            const originalText = saveBtn.textContent;
+            saveBtn.textContent = 'Đang lưu...';
+            saveBtn.disabled = true;
+
+            // Simulate API call
+            setTimeout(() => {
+                // In a real app, send data to server
+                console.log('User data:', Object.fromEntries(formData));
+
+                // Reset form and close modal
+                form.reset();
+                bootstrap.Modal.getInstance(document.getElementById('addUserModal')).hide();
+
+                // Show success message
+                showNotification('Thêm người dùng thành công!', 'success');
+
+                // Reset button
+                saveBtn.textContent = originalText;
+                saveBtn.disabled = false;
+
+                // Reload users data
+                if (currentPage === 'users') {
+                    loadUsersData();
+                }
+            }, 1500);
+        }
+
+        // Save word function
+        function saveWord() {
+            const form = document.getElementById('addWordForm');
+            const formData = new FormData(form);
+
+            // Show loading state
+            const saveBtn = event.target;
+            const originalText = saveBtn.textContent;
+            saveBtn.textContent = 'Đang lưu...';
+            saveBtn.disabled = true;
+
+            // Simulate API call
+            setTimeout(() => {
+                // In a real app, send data to server
+                console.log('Word data:', Object.fromEntries(formData));
+
+                // Reset form and close modal
+                form.reset();
+                bootstrap.Modal.getInstance(document.getElementById('addWordModal')).hide();
+
+                // Show success message
+                showNotification('Thêm từ vựng thành công!', 'success');
+
+                // Reset button
+                saveBtn.textContent = originalText;
+                saveBtn.disabled = false;
+
+                // Reload words data
+                if (currentPage === 'words') {
+                    loadWordsData();
+                }
+            }, 1500);
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            notification.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            document.body.appendChild(notification);
+
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        // Delete confirmation
+        function confirmDelete(type, id) {
+            if (confirm(`Bạn có chắc chắn muốn xóa ${type} này?`)) {
+                // In a real app, make API call to delete
+                showNotification(`Đã xóa ${type} thành công!`, 'success');
+
+                // Reload current page data
+                loadPageData(currentPage);
+            }
+        }
+
+        // Export data
+        function exportData(type) {
+            showNotification(`Đang xuất dữ liệu ${type}...`, 'info');
+
+            // Simulate export process
+            setTimeout(() => {
+                showNotification(`Xuất dữ liệu ${type} thành công!`, 'success');
+            }, 2000);
+        }
+
+        // Search functionality
+        function setupSearch() {
+            const searchInputs = document.querySelectorAll('input[placeholder*="Tìm kiếm"]');
+
+            searchInputs.forEach(input => {
+                input.addEventListener('input', function () {
+                    const searchTerm = this.value.toLowerCase();
+                    const table = this.closest('.page-content').querySelector('table tbody');
+
+                    if (table) {
+                        const rows = table.querySelectorAll('tr');
+                        rows.forEach(row => {
+                            const text = row.textContent.toLowerCase();
+                            row.style.display = text.includes(searchTerm) ? '' : 'none';
+                        });
+                    }
+                });
+            });
+        }
+
+        // Call setup search when DOM is loaded
+        document.addEventListener('DOMContentLoaded', setupSearch);
+
+        // Refresh data
+        function refreshData() {
+            showNotification('Đang làm mới dữ liệu...', 'info');
+            loadPageData(currentPage);
+
+            setTimeout(() => {
+                showNotification('Dữ liệu đã được cập nhật!', 'success');
+            }, 1000);
+        }
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function (e) {
+            // Ctrl/Cmd + B to toggle sidebar
+            if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
+                e.preventDefault();
+                toggleSidebar();
+            }
+
+            // Ctrl/Cmd + N to add new item
+            if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+                e.preventDefault();
+                if (currentPage === 'users') {
+                    bootstrap.Modal.getInstance(document.getElementById('addUserModal')).show();
+                } else if (currentPage === 'words') {
+                    bootstrap.Modal.getInstance(document.getElementById('addWordModal')).show();
+                }
+            }
+
+            // F5 to refresh data
+            if (e.key === 'F5') {
+                e.preventDefault();
+                refreshData();
+            }
+        });
+    </script>
+</body>
+
+</html>

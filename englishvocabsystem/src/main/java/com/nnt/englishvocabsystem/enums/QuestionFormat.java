@@ -5,10 +5,7 @@ public enum QuestionFormat {
     FILL_BLANK("fill_blank"),
     LISTENING_GAP("listening_gap"),
     SPEAKING("speaking");
-//    TRUE_FALSE("true_false"),
-//    MATCHING("matching"),
-//    TRANSLATION("translation"),
-//    IMAGE_CHOICE("image_choice");
+
 
     private final String value;
 

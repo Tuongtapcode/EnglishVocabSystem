@@ -272,7 +272,7 @@ const ReviewWordsList = ({ navigation }) => {
 
     return (
       <Card
-        key={word.Id}
+        key={word.id}
         style={[styles.wordCard, isOverdue && styles.overdueCard]}
       >
         <Card.Content>

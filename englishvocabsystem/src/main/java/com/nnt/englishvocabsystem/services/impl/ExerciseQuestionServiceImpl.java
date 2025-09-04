@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -54,6 +55,39 @@ public class ExerciseQuestionServiceImpl implements ExerciseQuestionService {
         });
     }
 
+    @Override
+    public Page<ExerciseQuestionDTO> getAllQuestions(Map<String, String> params) {
+        // Lấy page & size từ params
+        int page = Integer.parseInt(params.getOrDefault("page", "0"));
+        int size = Integer.parseInt(params.getOrDefault("size", "10"));
+        String sortBy = params.getOrDefault("sortBy", "id");
+        String direction = params.getOrDefault("direction", "asc");
 
+        Sort sort = Sort.by(
+                direction.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC,
+                sortBy
+        );
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        // Nếu muốn filter/search, bạn có thể dùng Specification như ở UserService
+        Page<ExerciseQuestion> pageResult = exerciseQuestionRepository.findAll(pageable);
+
+        // Chuyển sang DTO
+        return pageResult.map(q -> {
+            List<ExerciseOptionDTO> optionDTOs = q.getOptions().stream()
+                    .map(o -> new ExerciseOptionDTO(o.getId(), o.getOptionText(), o.getIsCorrect()))
+                    .collect(Collectors.toList());
+
+            return new ExerciseQuestionDTO(
+                    q.getId(),
+                    q.getQuestionText(),
+                    q.getQuestionFormat().name(),
+                    q.getAudioUrl(),
+                    q.getImageUrl(),
+                    q.getExplanation(),
+                    optionDTOs
+            );
+        });
+    }
 
 }
