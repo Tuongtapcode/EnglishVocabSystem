@@ -10,6 +10,7 @@ import java.time.Instant;
 public class UserAchievement {
     @Id
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @NotNull

@@ -6,8 +6,7 @@ import com.nnt.englishvocabsystem.exceptions.ResourceNotFoundException;
 import com.nnt.englishvocabsystem.exceptions.SessionAlreadyCompletedException;
 import com.nnt.englishvocabsystem.exceptions.UnauthorizedException;
 import com.nnt.englishvocabsystem.repositories.*;
-import com.nnt.englishvocabsystem.services.StudySessionAnswerService;
-import com.nnt.englishvocabsystem.services.WordProgressService;
+import com.nnt.englishvocabsystem.services.*;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,6 +32,12 @@ public class StudySessionAnswerServiceImpl implements StudySessionAnswerService 
 
     @Autowired
     private WordProgressService wordProgressService;
+
+    @Autowired
+    private UserStreakService userStreakService;
+
+    @Autowired
+    private AchievementService achievementService;
 
     @Override
     public AnswerGradingResponse submitAndGradeAnswer(User user, SubmitAnswerRequest request) {
@@ -173,12 +178,12 @@ public class StudySessionAnswerServiceImpl implements StudySessionAnswerService 
         if (Boolean.TRUE.equals(session.getCompleted())) {
             throw new SessionAlreadyCompletedException("Session already completed");
         }
-
         // 2. Đánh dấu hoàn thành
         session.setCompleted(true);
-        int durationMinutes = (int) ChronoUnit.MINUTES.between(session.getStartTime(), Instant.now());
+        Instant endTime = Instant.now();
+        int durationMinutes = (int) ChronoUnit.MINUTES.between(session.getStartTime(), endTime);
         session.setDurationMinutes(durationMinutes);
-        session.setEndTime(Instant.now());
+        session.setEndTime(endTime);
         sessionRepository.save(session);
 
         // 3. Lấy answers
@@ -261,10 +266,10 @@ public class StudySessionAnswerServiceImpl implements StudySessionAnswerService 
         response.setSummary(summary);
         response.setQuestions(questionDetails);
         response.setWordUpdates(wordUpdates);
-
+        // 9. Update streak
+        userStreakService.updateUserStreak(user, wordUpdates.size(), session.getDurationMinutes());
+        // 10. Check achievements
+        achievementService.checkAchievements(user);
         return response;
     }
-
-
-
 }

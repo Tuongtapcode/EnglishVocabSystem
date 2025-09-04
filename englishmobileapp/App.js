@@ -1,16 +1,46 @@
 import { NavigationContainer } from "@react-navigation/native";
 import AppNavigator from "./navigation/AppNavigator";
 import { MyUserContext, MyDispatchContext } from "./configs/MyContexts";
-import { useEffect, useReducer, useRef, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import MyUserReducer from "./reducers/MyUserReducer";
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { PaperProvider } from "react-native-paper";
 import { authApis, endpoints } from "./configs/Apis";
-import { Text } from "react-native";
+import { Alert, Text } from "react-native";
+import messaging from "@react-native-firebase/messaging"; // ✅ thêm
+
 export default function App() {
   const [user, dispatch] = useReducer(MyUserReducer, null);
   const [loading, setLoading] = useState(true);
+
+  // 🔹 Hàm setup Firebase Notification
+  const setupFCM = async () => {
+    try {
+      // Yêu cầu quyền (iOS)
+      await messaging().requestPermission();
+
+      // Lấy token FCM
+      const fcmToken = await messaging().getToken();
+      console.log("FCM Token:", fcmToken);
+
+      // 👉 TODO: Gửi fcmToken này về Spring Boot backend để lưu theo user
+      // Ví dụ: await api.post(endpoints["saveToken"], { token: fcmToken });
+
+      // Nghe thông báo foreground
+      const unsubscribe = messaging().onMessage(async (remoteMessage) => {
+        Alert.alert(
+          remoteMessage.notification?.title || "Thông báo",
+          remoteMessage.notification?.body || ""
+        );
+      });
+
+      return unsubscribe;
+    } catch (err) {
+      console.error("FCM setup error:", err);
+    }
+  };
+
   useEffect(() => {
     const loadUser = async () => {
       try {
@@ -32,6 +62,9 @@ export default function App() {
     };
 
     loadUser();
+
+    // 🔹 Setup FCM khi app khởi động
+    setupFCM();
   }, []);
 
   if (loading) {
