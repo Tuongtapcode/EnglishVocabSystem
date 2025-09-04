@@ -16,6 +16,7 @@ import java.util.Optional;
 @Repository
 public interface WordProgressRepository extends JpaRepository<WordProgress, Integer>, JpaSpecificationExecutor<WordProgress> {
     Optional<WordProgress> findByUserAndWord(User user, Word word);
+    long countByUserAndIsLearningFalse(User user);
 
 
     // Lấy tất cả từ đang học

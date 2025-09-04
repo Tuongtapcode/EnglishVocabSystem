@@ -1,6 +1,7 @@
 package com.nnt.englishvocabsystem.repositories;
 
 import com.nnt.englishvocabsystem.entity.StudySession;
+import com.nnt.englishvocabsystem.entity.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,6 +18,8 @@ public interface StudySessionRepository extends JpaRepository<StudySession, Inte
     List<StudySession> findByUserIdAndCompleted(Integer userId, Boolean completed);
 
     Optional<StudySession> findTopByUserIdOrderByStartTimeDesc(Integer userId);
+
+    long countByUserAndCompletedTrue(User user);
 
 
     List<StudySession> findByUserIdAndSessionType(Integer userId, String sessionType);
